@@ -1,0 +1,182 @@
+@import "tailwindcss";
+
+@theme {
+  /* Colors - Paper & Ink */
+  --color-paper: #f8f7f4;
+  --color-paper-dark: #f0efe9;
+  --color-ink: #1a1a1a;
+  --color-ink-light: #2d2d2d;
+  --color-zinc-faded: #71717a;
+  --color-zinc-400: #a1a1aa;
+  --color-zinc-300: #d4d4d8;
+  --color-zinc-200: #e4e4e7;
+
+  /* Typography */
+  --font-serif: "Cormorant Garamond", serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Font sizes for titles */
+  --text-display: clamp(4rem, 12vw, 10rem);
+  --text-headline: clamp(2.5rem, 6vw, 4rem);
+  --text-title: clamp(1.5rem, 3vw, 2rem);
+
+  /* Animation */
+  --ease-elegant: cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-slow: 800ms var(--ease-elegant);
+  --transition-medium: 500ms var(--ease-elegant);
+  --transition-fast: 300ms var(--ease-elegant);
+
+  /* Spacing */
+  --section-spacing: clamp(6rem, 15vh, 12rem);
+}
+
+/* Base Styles */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-weight: 300;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Selection */
+::selection {
+  background-color: var(--color-ink);
+  color: var(--color-paper);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-paper);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-zinc-300);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-zinc-400);
+}
+
+/* Utility Classes */
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+.font-sans {
+  font-family: var(--font-sans);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Magazine Line Animation */
+@keyframes line-expand {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.magazine-line {
+  height: 0.5px;
+  background-color: var(--color-zinc-300);
+  transform-origin: left center;
+  animation: line-expand var(--transition-slow) forwards;
+}
+
+/* Scroll Reveal Animation */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reveal {
+  opacity: 0;
+}
+
+.reveal.visible {
+  animation: fade-up var(--transition-slow) forwards;
+}
+
+/* Stagger delay utilities */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+
+/* Hover italic transition for headings */
+.hover-italic {
+  transition: font-style var(--transition-fast);
+}
+
+.hover-italic:hover {
+  font-style: italic;
+}
+
+/* Drop Cap */
+.drop-cap::first-letter {
+  float: left;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 4em;
+  line-height: 0.8;
+  padding-right: 0.1em;
+  margin-top: 0.1em;
+  color: var(--color-ink);
+}
+
+/* Data Stream - vertical text */
+.data-stream {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  color: var(--color-zinc-400);
+  text-transform: uppercase;
+}
+
+/* Tech Table Styling */
+.tech-table {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+.tech-table tr {
+  border-bottom: 0.5px solid var(--color-zinc-200);
+}
+
+.tech-table td {
+  padding: 0.75rem 0;
+}
+
+.tech-table td:first-child {
+  color: var(--color-zinc-faded);
+  padding-right: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.75rem;
+}
