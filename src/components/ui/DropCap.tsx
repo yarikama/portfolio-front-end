@@ -7,7 +7,7 @@ interface DropCapProps {
 
 export default function DropCap({ children, className = '' }: DropCapProps) {
   return (
-    <p className={`drop-cap text-lg leading-relaxed ${className}`}>
+    <p className={`drop-cap leading-relaxed ${className}`}>
       {children}
     </p>
   )

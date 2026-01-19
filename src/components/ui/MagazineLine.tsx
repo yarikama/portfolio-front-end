@@ -30,7 +30,7 @@ export default function MagazineLine({ className = '', delay = 0 }: MagazineLine
   return (
     <div
       ref={lineRef}
-      className={`h-[0.5px] bg-zinc-300 ${className}`}
+      className={`h-[0.5px] bg-zinc-300 dark:bg-zinc-300/30 ${className}`}
       style={{
         transform: isVisible ? 'scaleX(1)' : 'scaleX(0)',
         transformOrigin: 'left center',

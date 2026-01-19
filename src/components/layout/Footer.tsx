@@ -1,13 +1,14 @@
 import Container from './Container'
+import { Github, Linkedin, Mail } from 'lucide-react'
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="fixed bottom-0 left-0 right-0 z-40 py-4 bg-paper/90 backdrop-blur-sm border-t border-zinc-200">
+    <footer className="fixed bottom-0 left-0 right-0 z-40 py-4 bg-paper/90 dark:bg-[#0f0f0f]/90 backdrop-blur-sm border-t border-zinc-200 dark:border-zinc-200/20 transition-colors duration-300">
       <Container>
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-          <div className="font-mono text-xs text-zinc-faded uppercase tracking-widest">
+          <div className="font-mono text-sm text-zinc-faded uppercase tracking-widest">
             <span className="font-serif text-sm normal-case tracking-normal italic">
               Henry Hsu
             </span>
@@ -15,28 +16,31 @@ export default function Footer() {
             <span>{currentYear}</span>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-5">
             <a
               href="https://github.com/yarikama"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-mono text-xs text-zinc-faded hover:text-ink uppercase tracking-widest transition-colors duration-300"
+              className="text-zinc-faded hover:text-sage transition-colors duration-300"
+              aria-label="GitHub"
             >
-              GitHub
+              <Github size={18} />
             </a>
             <a
               href="https://linkedin.com/in/yarikama"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-mono text-xs text-zinc-faded hover:text-ink uppercase tracking-widest transition-colors duration-300"
+              className="text-zinc-faded hover:text-sage transition-colors duration-300"
+              aria-label="LinkedIn"
             >
-              LinkedIn
+              <Linkedin size={18} />
             </a>
             <a
               href="mailto:hsuhengjui@gmail.com"
-              className="font-mono text-xs text-zinc-faded hover:text-ink uppercase tracking-widest transition-colors duration-300"
+              className="text-zinc-faded hover:text-sage transition-colors duration-300"
+              aria-label="Email"
             >
-              Email
+              <Mail size={18} />
             </a>
           </div>
         </div>

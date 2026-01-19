@@ -7,7 +7,7 @@ export default function BriefSelection() {
   return (
     <Section id="works">
       <div className="mb-16">
-        <span className="font-mono text-xs text-zinc-400 uppercase tracking-widest">
+        <span className="font-mono text-sm text-zinc-400 uppercase tracking-widest">
           Selected Works
         </span>
         <h2 className="font-serif text-4xl md:text-5xl font-light mt-4 tracking-tight">
