@@ -56,8 +56,9 @@ export default function Contact() {
             <a
               key={link.label}
               href={link.href}
-              target={link.href.startsWith('http') ? '_blank' : undefined}
-              rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+              target="_blank"
+              rel="noopener noreferrer"
+              download={link.href.endsWith('.pdf') ? true : undefined}
               className="
                 group p-6 border border-zinc-200 hover:border-zinc-400
                 transition-all duration-300
