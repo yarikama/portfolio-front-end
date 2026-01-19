@@ -15,7 +15,7 @@ export default function Archive() {
   return (
     <Section id="archive">
       <div className="mb-16">
-        <span className="font-mono text-xs text-zinc-400 uppercase tracking-widest">
+        <span className="font-mono text-sm text-zinc-400 uppercase tracking-widest">
           Archive
         </span>
         <h2 className="font-serif text-4xl md:text-5xl font-light mt-4 tracking-tight">
@@ -37,8 +37,8 @@ export default function Archive() {
               px-4 py-2 border transition-all duration-300
               ${
                 activeCategory === category.id
-                  ? 'border-ink text-ink bg-ink/5'
-                  : 'border-zinc-200 text-zinc-faded hover:border-zinc-400 hover:text-ink'
+                  ? 'border-ink text-ink bg-ink/5 dark:border-zinc-400 dark:bg-zinc-400/10'
+                  : 'border-zinc-200 dark:border-zinc-200/20 text-zinc-faded hover:border-zinc-400 hover:text-ink'
               }
             `}
           >
@@ -63,8 +63,8 @@ export default function Archive() {
         </div>
       )}
 
-      <div className="mt-16 pt-8 border-t border-zinc-200">
-        <p className="font-mono text-xs text-zinc-400 uppercase tracking-widest text-center">
+      <div className="mt-16 pt-8 border-t border-zinc-200 dark:border-zinc-200/20">
+        <p className="font-mono text-sm text-zinc-400 uppercase tracking-widest text-center">
           {filteredProjects.length} project{filteredProjects.length !== 1 ? 's' : ''} /{' '}
           {activeCategory === 'all' ? 'All Categories' : activeCategory}
         </p>

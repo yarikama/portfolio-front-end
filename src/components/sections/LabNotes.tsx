@@ -9,7 +9,7 @@ export default function LabNotes() {
   return (
     <Section id="notes">
       <div className="mb-16">
-        <span className="font-mono text-xs text-zinc-400 uppercase tracking-widest">
+        <span className="font-mono text-sm text-zinc-400 uppercase tracking-widest">
           Lab Notes
         </span>
         <h2 className="font-serif text-4xl md:text-5xl font-light mt-4 tracking-tight">
@@ -35,10 +35,10 @@ export default function LabNotes() {
             >
               <a href={`#note-${note.id}`} className="block">
                 <div className="mb-4 flex items-center justify-between">
-                  <span className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest">
+                  <span className="font-mono text-[0.8rem] text-zinc-400 uppercase tracking-widest">
                     {note.date}
                   </span>
-                  <span className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest">
+                  <span className="font-mono text-[0.8rem] text-zinc-400 uppercase tracking-widest">
                     {note.readTime}
                   </span>
                 </div>
@@ -55,7 +55,7 @@ export default function LabNotes() {
                   {note.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="font-mono text-[0.6rem] text-zinc-400 uppercase tracking-widest px-2 py-1 border border-zinc-200"
+                      className="font-mono text-[0.75rem] text-zinc-400 uppercase tracking-widest px-2 py-1 border border-zinc-200"
                     >
                       {tag}
                     </span>
@@ -88,7 +88,7 @@ export default function LabNotes() {
       )}
 
       <div className="mt-16 text-center">
-        <p className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest">
+        <p className="font-mono text-[0.8rem] text-zinc-400 uppercase tracking-widest">
           More writings coming soon
         </p>
       </div>

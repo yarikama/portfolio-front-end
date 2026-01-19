@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import Container from './Container'
+import ThemeToggle from '../ui/ThemeToggle'
 
 const navItems = [
+  { label: 'About', href: '#about' },
   { label: 'Works', href: '#works' },
   { label: 'Archive', href: '#archive' },
   { label: 'Notes', href: '#notes' },
-  { label: 'About', href: '#about' },
   { label: 'Contact', href: '#contact' },
 ]
 
@@ -26,7 +27,7 @@ export default function Header() {
       className={`
         fixed top-0 left-0 right-0 z-50
         transition-all duration-500
-        ${isScrolled ? 'bg-paper/90 backdrop-blur-sm' : 'bg-transparent'}
+        ${isScrolled ? 'bg-paper/90 dark:bg-[#0f0f0f]/90 backdrop-blur-sm' : 'bg-transparent'}
       `}
     >
       <Container>
@@ -44,8 +45,8 @@ export default function Header() {
                 <a
                   href={item.href}
                   className="
-                    font-mono text-xs uppercase tracking-widest
-                    text-zinc-faded hover:text-ink
+                    font-mono text-[0.8125rem] uppercase tracking-widest
+                    text-zinc-faded hover:text-sage
                     transition-colors duration-300
                   "
                 >
@@ -53,10 +54,13 @@ export default function Header() {
                 </a>
               </li>
             ))}
+            <li>
+              <ThemeToggle />
+            </li>
           </ul>
 
           <button
-            className="md:hidden font-mono text-xs uppercase tracking-widest"
+            className="md:hidden font-mono text-[0.8125rem] uppercase tracking-widest"
             aria-label="Menu"
           >
             Menu

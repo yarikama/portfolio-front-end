@@ -18,7 +18,7 @@ export default function ProjectCard({ project, index, featured = false }: Projec
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
           <div className="flex items-baseline gap-4 mb-3">
-            <span className="font-mono text-xs text-zinc-400">{formattedIndex}</span>
+            <span className="font-mono text-sm text-zinc-400">{formattedIndex}</span>
             <h3
               className={`
                 font-serif font-light tracking-tight
@@ -40,7 +40,7 @@ export default function ProjectCard({ project, index, featured = false }: Projec
             {project.tags.map((tag) => (
               <span
                 key={tag}
-                className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest"
+                className="font-mono text-[0.8rem] text-zinc-400 uppercase tracking-widest"
               >
                 {tag}
               </span>
@@ -48,7 +48,7 @@ export default function ProjectCard({ project, index, featured = false }: Projec
           </div>
 
           {project.metrics && (
-            <div className="mt-4 font-mono text-xs text-zinc-faded">
+            <div className="mt-4 font-mono text-sm text-zinc-faded">
               {project.metrics}
             </div>
           )}

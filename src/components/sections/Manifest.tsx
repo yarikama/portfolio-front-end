@@ -39,7 +39,7 @@ export default function Manifest() {
   return (
     <Section id="manifest" narrow>
       <div className="text-center mb-16">
-        <span className="font-mono text-xs text-zinc-400 uppercase tracking-widest">
+        <span className="font-mono text-sm text-zinc-400 uppercase tracking-widest">
           Philosophy
         </span>
         <h2 className="font-serif text-4xl md:text-5xl font-light mt-4 tracking-tight">
@@ -77,7 +77,7 @@ export default function Manifest() {
         {principles.map((principle, index) => (
           <div key={principle.number} className="group">
             <div className="flex items-baseline gap-6">
-              <span className="font-mono text-xs text-zinc-400">{principle.number}</span>
+              <span className="font-mono text-sm text-zinc-400">{principle.number}</span>
               <div className="flex-1">
                 <h3 className="font-serif text-2xl font-light tracking-tight group-hover:italic transition-all duration-300 mb-3">
                   {principle.title}
@@ -97,7 +97,7 @@ export default function Manifest() {
           "Programs must be written for people to read, and only incidentally for machines to
           execute."
         </blockquote>
-        <cite className="block mt-4 font-mono text-xs text-zinc-400 uppercase tracking-widest not-italic">
+        <cite className="block mt-4 font-mono text-sm text-zinc-400 uppercase tracking-widest not-italic">
           — Harold Abelson, SICP
         </cite>
       </div>

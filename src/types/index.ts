@@ -3,7 +3,7 @@ export interface Project {
   title: string
   description: string
   tags: string[]
-  category: 'engineering' | 'ml' | 'design' | 'research'
+  category: 'engineering' | 'ml'
   year: string
   link?: string
   github?: string

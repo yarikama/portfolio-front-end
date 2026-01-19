@@ -116,6 +116,4 @@ export const projectCategories = [
   { id: 'all', label: 'All' },
   { id: 'engineering', label: 'Engineering' },
   { id: 'ml', label: 'ML/AI' },
-  { id: 'design', label: 'Design' },
-  { id: 'research', label: 'Research' },
 ] as const

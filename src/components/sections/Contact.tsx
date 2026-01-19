@@ -33,7 +33,7 @@ export default function Contact() {
   return (
     <Section id="contact" narrow>
       <div className="text-center mb-16">
-        <span className="font-mono text-xs text-zinc-400 uppercase tracking-widest">
+        <span className="font-mono text-sm text-zinc-400 uppercase tracking-widest">
           Contact
         </span>
         <h2 className="font-serif text-4xl md:text-5xl font-light mt-4 tracking-tight">
@@ -66,7 +66,7 @@ export default function Contact() {
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="font-mono text-xs text-zinc-400 uppercase tracking-widest mb-2">
+                  <p className="font-mono text-sm text-zinc-400 uppercase tracking-widest mb-2">
                     {link.label}
                   </p>
                   <p className="font-serif text-lg group-hover:italic transition-all duration-300">
@@ -75,7 +75,7 @@ export default function Contact() {
                 </div>
                 <Icon
                   size={20}
-                  className="text-zinc-400 group-hover:text-ink transition-colors duration-300"
+                  className="text-zinc-400 group-hover:text-sage transition-colors duration-300"
                 />
               </div>
             </a>
@@ -84,7 +84,7 @@ export default function Contact() {
       </div>
 
       <div className="mt-16 text-center">
-        <p className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest">
+        <p className="font-mono text-[0.8rem] text-zinc-400 uppercase tracking-widest">
           Houston, TX / Open to opportunities
         </p>
       </div>
