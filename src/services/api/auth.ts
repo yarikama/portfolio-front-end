@@ -32,12 +32,10 @@ export const authService = {
     }
 
     const data = await response.json()
-    console.log('Login response data:', data)
 
     // Handle different response formats
     const token = data.token || data.data?.token || data.access_token
     if (!token) {
-      console.error('No token found in response:', data)
       throw new Error('No token received from server')
     }
 

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, useNavigate, useLocation, Link } from 'react-router-dom'
 import { adminProjectsService, type CreateProjectData } from '../../services/api'
 import { ArrowLeft, Save, Loader2, ExternalLink } from 'lucide-react'
 import AdminNav from '../../components/admin/AdminNav'
+import type { Project } from '../../types'
 
 function generateSlug(title: string): string {
   return title
@@ -16,7 +17,11 @@ function generateSlug(title: string): string {
 export default function ProjectEditor() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const location = useLocation()
   const isEditing = Boolean(id)
+
+  // Get project data from location state (passed from list page)
+  const projectFromState = location.state?.project as Project | undefined
 
   const [formData, setFormData] = useState<CreateProjectData>({
     slug: '',
@@ -42,37 +47,33 @@ export default function ProjectEditor() {
   // Load existing project for editing
   useEffect(() => {
     if (isEditing && id) {
-      setIsLoadingProject(true)
-      adminProjectsService
-        .getById(id)
-        .then((response) => {
-          const project = response.data
-          setFormData({
-            slug: project.slug,
-            title: project.title,
-            description: project.description,
-            tags: project.tags,
-            category: project.category,
-            year: project.year,
-            link: project.link || '',
-            github: project.github || '',
-            metrics: project.metrics || '',
-            formula: project.formula || '',
-            featured: project.featured,
-            order: project.order,
-            published: project.published || false,
-          })
-          setTagsInput(project.tags.join(', '))
-          setAutoSlug(false)
+      // If we have project data from location state, use it directly
+      if (projectFromState && projectFromState.id === id) {
+        setFormData({
+          slug: projectFromState.slug,
+          title: projectFromState.title,
+          description: projectFromState.description,
+          tags: projectFromState.tags,
+          category: projectFromState.category,
+          year: projectFromState.year,
+          link: projectFromState.link || '',
+          github: projectFromState.github || '',
+          metrics: projectFromState.metrics || '',
+          formula: projectFromState.formula || '',
+          featured: projectFromState.featured,
+          order: projectFromState.order,
+          published: projectFromState.published || false,
         })
-        .catch(() => {
-          setError('Failed to load project')
-        })
-        .finally(() => {
-          setIsLoadingProject(false)
-        })
+        setTagsInput(projectFromState.tags.join(', '))
+        setAutoSlug(false)
+        setIsLoadingProject(false)
+      } else {
+        // Otherwise show error
+        setError('Project data not found. Please go back to the projects list.')
+        setIsLoadingProject(false)
+      }
     }
-  }, [id, isEditing])
+  }, [id, isEditing, projectFromState])
 
   const handleTitleChange = (title: string) => {
     setFormData((prev) => ({
@@ -137,7 +138,7 @@ export default function ProjectEditor() {
             </h1>
           </div>
           <div className="flex items-center gap-3">
-            {isEditing && formData.link && (
+            {isEditing && projectFromState && formData.link && (
               <a
                 href={formData.link}
                 target="_blank"

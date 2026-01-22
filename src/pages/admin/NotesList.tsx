@@ -140,6 +140,7 @@ export default function AdminNotesList() {
                   </Link>
                   <Link
                     to={`/admin/notes/${note.id}/edit`}
+                    state={{ note }}
                     className="p-2 text-zinc-400 hover:text-ink transition-colors"
                     title="Edit"
                   >

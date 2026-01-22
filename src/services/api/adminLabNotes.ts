@@ -46,6 +46,7 @@ async function authFetch<T>(url: string, options: RequestInit = {}): Promise<T> 
 
 export const adminLabNotesService = {
   async getAll(limit: number = 100): Promise<{ data: LabNote[] }> {
+    // Admin 专用 endpoint - 返回所有笔记（包括未发布的）
     return authFetch<{ data: LabNote[] }>(`${API_BASE_URL}/admin/lab-notes?limit=${limit}`)
   },
 
@@ -67,9 +68,5 @@ export const adminLabNotesService = {
     await authFetch<void>(`${API_BASE_URL}/admin/lab-notes/${id}`, {
       method: 'DELETE',
     })
-  },
-
-  async getById(id: string): Promise<ApiResponse<LabNote>> {
-    return authFetch<ApiResponse<LabNote>>(`${API_BASE_URL}/admin/lab-notes/${id}`)
   },
 }
