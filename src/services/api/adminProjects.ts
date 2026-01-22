@@ -46,26 +46,6 @@ class AdminProjectsService {
   }
 
   /**
-   * Get a single project by ID for editing
-   */
-  async getById(id: string): Promise<ApiResponse<Project>> {
-    const response = await fetch(
-      `${import.meta.env.VITE_API_BASE_URL || 'https://api.yarikama.com/api/v1'}/admin/projects/${id}`,
-      {
-        headers: {
-          ...this.getAuthHeaders(),
-        },
-      }
-    )
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch project')
-    }
-
-    return response.json()
-  }
-
-  /**
    * Create a new project
    */
   async create(data: CreateProjectData): Promise<ApiResponse<Project>> {
@@ -131,6 +111,31 @@ class AdminProjectsService {
       const error = await response.json().catch(() => ({}))
       throw new Error(error.error?.message || 'Failed to delete project')
     }
+  }
+
+  /**
+   * Reorder projects
+   */
+  async reorder(orders: Array<{ id: string; order: number }>): Promise<{ message: string; updated: number }> {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_BASE_URL || 'https://api.yarikama.com/api/v1'}/admin/projects/reorder`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...this.getAuthHeaders(),
+        },
+        body: JSON.stringify({ orders }),
+      }
+    )
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}))
+      throw new Error(error.error?.message || 'Failed to reorder projects')
+    }
+
+    const data = await response.json()
+    return data.data
   }
 }
 

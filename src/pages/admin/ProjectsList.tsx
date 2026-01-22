@@ -149,6 +149,7 @@ export default function AdminProjectsList() {
                   )}
                   <Link
                     to={`/admin/projects/${project.id}/edit`}
+                    state={{ project }}
                     className="p-2 text-zinc-400 hover:text-ink transition-colors"
                     title="Edit"
                   >

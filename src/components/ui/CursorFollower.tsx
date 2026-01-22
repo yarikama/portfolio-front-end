@@ -95,7 +95,7 @@ export default function CursorFollower() {
   if (!isVisible) return null
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-[9999]">
+    <div className="pointer-events-none fixed inset-0 z-9999">
       {/* Smooth Trail */}
       <svg className="absolute inset-0 w-full h-full">
         <defs>

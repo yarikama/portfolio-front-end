@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, useNavigate, useLocation, Link } from 'react-router-dom'
 import { adminLabNotesService, type CreateLabNoteData } from '../../services/api'
-import { useLabNote } from '../../hooks'
 import { ArrowLeft, Save, Loader2, Eye } from 'lucide-react'
 import AdminNav from '../../components/admin/AdminNav'
+import type { LabNote } from '../../types'
 
 function generateSlug(title: string): string {
   return title
@@ -24,7 +24,11 @@ function estimateReadTime(content: string): string {
 export default function NoteEditor() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const location = useLocation()
   const isEditing = Boolean(id)
+
+  // Get note data from location state (passed from list page)
+  const noteFromState = location.state?.note as LabNote | undefined
 
   const [formData, setFormData] = useState<CreateLabNoteData>({
     title: '',
@@ -38,28 +42,35 @@ export default function NoteEditor() {
   })
   const [tagsInput, setTagsInput] = useState('')
   const [isSaving, setIsSaving] = useState(false)
+  const [isLoadingNote, setIsLoadingNote] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [autoSlug, setAutoSlug] = useState(true)
 
   // Load existing note for editing
-  const { note: existingNote, isLoading: isLoadingNote } = useLabNote(id || '')
-
   useEffect(() => {
-    if (existingNote && isEditing) {
-      setFormData({
-        title: existingNote.title,
-        slug: existingNote.slug,
-        excerpt: existingNote.excerpt,
-        content: existingNote.content,
-        tags: existingNote.tags,
-        readTime: existingNote.readTime,
-        date: existingNote.date,
-        published: existingNote.published,
-      })
-      setTagsInput(existingNote.tags.join(', '))
-      setAutoSlug(false)
+    if (isEditing && id) {
+      // If we have note data from location state, use it directly
+      if (noteFromState && noteFromState.id === id) {
+        setFormData({
+          title: noteFromState.title,
+          slug: noteFromState.slug,
+          excerpt: noteFromState.excerpt,
+          content: noteFromState.content,
+          tags: noteFromState.tags,
+          readTime: noteFromState.readTime,
+          date: noteFromState.date,
+          published: noteFromState.published,
+        })
+        setTagsInput(noteFromState.tags.join(', '))
+        setAutoSlug(false)
+        setIsLoadingNote(false)
+      } else {
+        // Otherwise fetch from API using slug (need to navigate back or show error)
+        setError('Note data not found. Please go back to the notes list.')
+        setIsLoadingNote(false)
+      }
     }
-  }, [existingNote, isEditing])
+  }, [id, isEditing, noteFromState])
 
   const handleTitleChange = (title: string) => {
     setFormData((prev) => ({
@@ -132,9 +143,9 @@ export default function NoteEditor() {
             </h1>
           </div>
           <div className="flex items-center gap-3">
-            {isEditing && existingNote && (
+            {isEditing && noteFromState && (
               <Link
-                to={`/notes/${existingNote.slug}`}
+                to={`/notes/${noteFromState.slug}`}
                 target="_blank"
                 className="p-2 text-zinc-faded hover:text-ink transition-colors"
                 title="Preview"

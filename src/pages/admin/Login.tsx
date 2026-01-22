@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { Loader2 } from 'lucide-react'
+import ThemeToggle from '../../components/ui/ThemeToggle'
 
 export default function AdminLogin() {
   const [username, setUsername] = useState('')
@@ -21,7 +22,12 @@ export default function AdminLogin() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-paper dark:bg-[#0f0f0f] px-4">
+    <div className="min-h-screen flex items-center justify-center bg-paper dark:bg-[#0f0f0f] px-4 relative">
+      {/* Theme Toggle - Top Right */}
+      <div className="absolute top-6 right-6">
+        <ThemeToggle />
+      </div>
+
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <h1 className="font-serif text-3xl font-light tracking-tight mb-2">Admin</h1>
