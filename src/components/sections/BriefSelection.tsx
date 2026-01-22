@@ -1,9 +1,13 @@
+import { Link } from 'react-router-dom'
 import Section from '../layout/Section'
 import ProjectCard from '../ui/ProjectCard'
 import MagazineLine from '../ui/MagazineLine'
-import { featuredProjects } from '../../data/projects'
+import { useFeaturedProjects } from '../../hooks'
+import { Loader2 } from 'lucide-react'
 
 export default function BriefSelection() {
+  const { projects, isLoading, error } = useFeaturedProjects()
+
   return (
     <Section id="works">
       <div className="mb-16">
@@ -21,15 +25,28 @@ export default function BriefSelection() {
 
       <MagazineLine className="mb-12" />
 
-      <div className="space-y-16">
-        {featuredProjects.map((project, index) => (
-          <ProjectCard key={project.id} project={project} index={index} featured />
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="py-16 flex flex-col items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-zinc-400 mb-4" />
+          <p className="text-sm text-zinc-400">Loading projects...</p>
+        </div>
+      ) : error ? (
+        <div className="py-16 text-center">
+          <p className="font-serif text-xl text-zinc-faded italic">
+            Unable to load projects at this time.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-16">
+          {projects.map((project, index) => (
+            <ProjectCard key={project.id} project={project} index={index} featured />
+          ))}
+        </div>
+      )}
 
       <div className="mt-16 text-center">
-        <a
-          href="#archive"
+        <Link
+          to="/archive"
           className="
             inline-block font-mono text-xs uppercase tracking-widest
             text-zinc-faded hover:text-ink
@@ -38,7 +55,7 @@ export default function BriefSelection() {
           "
         >
           View Full Archive
-        </a>
+        </Link>
       </div>
     </Section>
   )

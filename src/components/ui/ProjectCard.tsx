@@ -1,9 +1,18 @@
 import { ArrowUpRight } from 'lucide-react'
-import type { Project } from '../../types'
 import MagazineLine from './MagazineLine'
 
+// Base project type that works with both API and local data
+interface ProjectCardData {
+  id: string
+  title: string
+  description: string
+  tags: string[]
+  link?: string | null
+  metrics?: string | null
+}
+
 interface ProjectCardProps {
-  project: Project
+  project: ProjectCardData
   index: number
   featured?: boolean
 }

@@ -1,4 +1,23 @@
-export interface Project {
+// Re-export API types
+export type {
+  ApiResponse,
+  PaginatedResponse,
+  Pagination,
+  ApiError,
+  LabNote,
+  LabNoteListItem,
+  Project,
+  ProjectCategory,
+  LabNoteTag,
+  ContactMessage,
+  ContactFormData,
+  ContactSubmitResponse,
+  LabNotesQueryParams,
+  ProjectsQueryParams,
+} from './api'
+
+// Local/static data types (for fallback data)
+export interface LocalProject {
   id: string
   title: string
   description: string
@@ -15,15 +34,6 @@ export interface Project {
 export interface TechCategory {
   category: string
   items: string[]
-}
-
-export interface LabNote {
-  id: string
-  title: string
-  excerpt: string
-  date: string
-  tags: string[]
-  readTime: string
 }
 
 export interface NavItem {
