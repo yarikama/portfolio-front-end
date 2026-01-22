@@ -1,0 +1,125 @@
+// API Response Types
+
+export interface ApiResponse<T> {
+  data: T
+}
+
+export interface PaginatedResponse<T> {
+  data: T[]
+  pagination: Pagination
+}
+
+export interface Pagination {
+  total: number
+  limit: number
+  offset: number
+  hasMore: boolean
+}
+
+export interface ApiError {
+  error: {
+    code: string
+    message: string
+    details?: Array<{ field: string; message: string }>
+    retryAfter?: number
+  }
+}
+
+// LabNotes Types
+export interface LabNote {
+  id: string
+  title: string
+  slug: string
+  excerpt: string
+  content: string
+  tags: string[]
+  readTime: string
+  date: string
+  published: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface LabNoteListItem {
+  id: string
+  title: string
+  slug: string
+  excerpt: string
+  tags: string[]
+  readTime: string
+  date: string
+  createdAt: string
+  updatedAt: string
+}
+
+// Projects Types (API response)
+export interface Project {
+  id: string
+  slug: string
+  title: string
+  description: string
+  tags: string[]
+  category: 'engineering' | 'ml'
+  year: string
+  link?: string | null
+  github?: string | null
+  metrics?: string | null
+  formula?: string | null
+  featured: boolean
+  order: number
+  published?: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ProjectCategory {
+  id: string
+  label: string
+  count: number
+}
+
+export interface LabNoteTag {
+  tag: string
+  count: number
+}
+
+// Contact Types
+export interface ContactMessage {
+  id: string
+  name: string
+  email: string
+  subject: string
+  message: string
+  read: boolean
+  replied: boolean
+  createdAt: string
+}
+
+export interface ContactFormData {
+  name: string
+  email: string
+  subject: string
+  message: string
+}
+
+export interface ContactSubmitResponse {
+  id: string
+  message: string
+}
+
+// Query Parameters
+export interface LabNotesQueryParams {
+  tag?: string
+  limit?: number
+  offset?: number
+  [key: string]: string | number | boolean | undefined
+}
+
+export interface ProjectsQueryParams {
+  category?: 'engineering' | 'ml'
+  featured?: boolean
+  tag?: string
+  limit?: number
+  offset?: number
+  [key: string]: string | number | boolean | undefined
+}

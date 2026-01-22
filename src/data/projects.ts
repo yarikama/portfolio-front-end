@@ -1,6 +1,6 @@
-import type { Project } from '../types'
+import type { LocalProject } from '../types'
 
-export const projects: Project[] = [
+export const projects: LocalProject[] = [
   {
     id: 'maiagent-platform',
     title: 'The MaiAgent Platform',

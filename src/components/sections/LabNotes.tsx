@@ -1,10 +1,12 @@
+import { Link } from 'react-router-dom'
 import Section from '../layout/Section'
 import MagazineLine from '../ui/MagazineLine'
-import { labNotes } from '../../data/techStack'
-import { ArrowUpRight } from 'lucide-react'
+import { useLabNotes } from '../../hooks'
+import { ArrowUpRight, Loader2 } from 'lucide-react'
 
 export default function LabNotes() {
-  const hasNotes = labNotes.length > 0
+  const { notes, isLoading, error } = useLabNotes({ limit: 3 })
+  const hasNotes = notes.length > 0
 
   return (
     <Section id="notes">
@@ -25,59 +27,14 @@ export default function LabNotes() {
 
       <MagazineLine className="mb-12" />
 
-      {hasNotes ? (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {labNotes.map((note, index) => (
-            <article
-              key={note.id}
-              className="group"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <a href={`#note-${note.id}`} className="block">
-                <div className="mb-4 flex items-center justify-between">
-                  <span className="font-mono text-[0.8rem] text-zinc-400 uppercase tracking-widest">
-                    {note.date}
-                  </span>
-                  <span className="font-mono text-[0.8rem] text-zinc-400 uppercase tracking-widest">
-                    {note.readTime}
-                  </span>
-                </div>
-
-                <h3 className="font-serif text-xl font-light tracking-tight group-hover:italic transition-all duration-300 mb-3">
-                  {note.title}
-                </h3>
-
-                <p className="text-sm text-zinc-faded leading-relaxed mb-4">
-                  {note.excerpt}
-                </p>
-
-                <div className="flex flex-wrap gap-2">
-                  {note.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="font-mono text-[0.75rem] text-zinc-400 uppercase tracking-widest px-2 py-1 border border-zinc-200"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="mt-4 flex items-center gap-2 text-zinc-faded group-hover:text-ink transition-colors duration-300">
-                  <span className="font-mono text-xs uppercase tracking-widest">Read</span>
-                  <ArrowUpRight
-                    size={14}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  />
-                </div>
-              </a>
-
-              <MagazineLine className="mt-6" delay={index * 50} />
-            </article>
-          ))}
+      {isLoading ? (
+        <div className="py-12 flex flex-col items-center justify-center">
+          <Loader2 className="w-6 h-6 animate-spin text-zinc-400 mb-3" />
+          <p className="text-sm text-zinc-400">Loading...</p>
         </div>
-      ) : (
-        <div className="py-16 text-center">
-          <p className="font-serif text-2xl text-zinc-faded italic mb-4">
+      ) : error || !hasNotes ? (
+        <div className="py-12 text-center">
+          <p className="font-serif text-xl text-zinc-faded italic mb-4">
             Coming Soon
           </p>
           <p className="text-sm text-zinc-400 max-w-md mx-auto">
@@ -85,12 +42,51 @@ export default function LabNotes() {
             philosophy are in progress.
           </p>
         </div>
+      ) : (
+        <div className="space-y-6">
+          {notes.map((note, index) => (
+            <Link
+              key={note.id}
+              to={`/notes/${note.slug}`}
+              className="group block"
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              <div className="flex items-baseline justify-between gap-4 py-4 border-b border-zinc-200 dark:border-zinc-800 group-hover:border-zinc-400 transition-colors">
+                <div className="flex items-baseline gap-4 min-w-0">
+                  <span className="font-mono text-sm text-zinc-400 shrink-0">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <h3 className="font-serif text-xl md:text-2xl font-light tracking-tight group-hover:italic transition-all duration-300 truncate">
+                    {note.title}
+                  </h3>
+                </div>
+                <div className="flex items-center gap-3 shrink-0">
+                  <span className="font-mono text-xs text-zinc-400 uppercase tracking-widest hidden sm:block">
+                    {note.readTime}
+                  </span>
+                  <ArrowUpRight
+                    size={16}
+                    className="text-zinc-400 group-hover:text-ink transition-colors duration-300"
+                  />
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
       )}
 
-      <div className="mt-16 text-center">
-        <p className="font-mono text-[0.8rem] text-zinc-400 uppercase tracking-widest">
-          More writings coming soon
-        </p>
+      <div className="mt-12 text-center">
+        <Link
+          to="/notes"
+          className="
+            inline-block font-mono text-xs uppercase tracking-widest
+            text-zinc-faded hover:text-ink
+            border-b border-zinc-300 hover:border-ink
+            pb-1 transition-all duration-300
+          "
+        >
+          View All Notes
+        </Link>
       </div>
     </Section>
   )
