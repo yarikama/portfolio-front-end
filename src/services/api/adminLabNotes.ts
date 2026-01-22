@@ -45,27 +45,31 @@ async function authFetch<T>(url: string, options: RequestInit = {}): Promise<T> 
 }
 
 export const adminLabNotesService = {
+  async getAll(limit: number = 100): Promise<{ data: LabNote[] }> {
+    return authFetch<{ data: LabNote[] }>(`${API_BASE_URL}/admin/lab-notes?limit=${limit}`)
+  },
+
   async create(data: CreateLabNoteData): Promise<ApiResponse<LabNote>> {
-    return authFetch<ApiResponse<LabNote>>(`${API_BASE_URL}/lab-notes`, {
+    return authFetch<ApiResponse<LabNote>>(`${API_BASE_URL}/admin/lab-notes`, {
       method: 'POST',
       body: JSON.stringify(data),
     })
   },
 
   async update(id: string, data: UpdateLabNoteData): Promise<ApiResponse<LabNote>> {
-    return authFetch<ApiResponse<LabNote>>(`${API_BASE_URL}/lab-notes/${id}`, {
+    return authFetch<ApiResponse<LabNote>>(`${API_BASE_URL}/admin/lab-notes/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     })
   },
 
   async delete(id: string): Promise<void> {
-    await authFetch<void>(`${API_BASE_URL}/lab-notes/${id}`, {
+    await authFetch<void>(`${API_BASE_URL}/admin/lab-notes/${id}`, {
       method: 'DELETE',
     })
   },
 
   async getById(id: string): Promise<ApiResponse<LabNote>> {
-    return authFetch<ApiResponse<LabNote>>(`${API_BASE_URL}/lab-notes/${id}`)
+    return authFetch<ApiResponse<LabNote>>(`${API_BASE_URL}/admin/lab-notes/${id}`)
   },
 }

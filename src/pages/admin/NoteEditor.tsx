@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { adminLabNotesService, type CreateLabNoteData } from '../../services/api'
-import { useLabNote } from '../../hooks'
 import { ArrowLeft, Save, Loader2, Eye } from 'lucide-react'
 import AdminNav from '../../components/admin/AdminNav'
+import type { LabNote } from '../../types'
 
 function generateSlug(title: string): string {
   return title
@@ -38,28 +38,41 @@ export default function NoteEditor() {
   })
   const [tagsInput, setTagsInput] = useState('')
   const [isSaving, setIsSaving] = useState(false)
+  const [isLoadingNote, setIsLoadingNote] = useState(false)
+  const [existingNote, setExistingNote] = useState<LabNote | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [autoSlug, setAutoSlug] = useState(true)
 
   // Load existing note for editing
-  const { note: existingNote, isLoading: isLoadingNote } = useLabNote(id || '')
-
   useEffect(() => {
-    if (existingNote && isEditing) {
-      setFormData({
-        title: existingNote.title,
-        slug: existingNote.slug,
-        excerpt: existingNote.excerpt,
-        content: existingNote.content,
-        tags: existingNote.tags,
-        readTime: existingNote.readTime,
-        date: existingNote.date,
-        published: existingNote.published,
-      })
-      setTagsInput(existingNote.tags.join(', '))
-      setAutoSlug(false)
+    if (isEditing && id) {
+      setIsLoadingNote(true)
+      adminLabNotesService
+        .getById(id)
+        .then((response) => {
+          const note = response.data
+          setExistingNote(note)
+          setFormData({
+            title: note.title,
+            slug: note.slug,
+            excerpt: note.excerpt,
+            content: note.content,
+            tags: note.tags,
+            readTime: note.readTime,
+            date: note.date,
+            published: note.published,
+          })
+          setTagsInput(note.tags.join(', '))
+          setAutoSlug(false)
+        })
+        .catch(() => {
+          setError('Failed to load note')
+        })
+        .finally(() => {
+          setIsLoadingNote(false)
+        })
     }
-  }, [existingNote, isEditing])
+  }, [id, isEditing])
 
   const handleTitleChange = (title: string) => {
     setFormData((prev) => ({

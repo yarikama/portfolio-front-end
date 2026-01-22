@@ -1,21 +1,33 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useLabNotes } from '../../hooks'
-import { useAuth } from '../../hooks/useAuth'
 import { adminLabNotesService } from '../../services/api'
-import { Plus, Edit, Trash2, LogOut, Loader2, Eye, EyeOff } from 'lucide-react'
+import { Plus, Edit, Trash2, Loader2, Eye } from 'lucide-react'
 import AdminNav from '../../components/admin/AdminNav'
+import type { LabNote } from '../../types'
 
 export default function AdminNotesList() {
-  const { notes, isLoading, error, refetch } = useLabNotes({ limit: 100 })
-  const { logout } = useAuth()
   const navigate = useNavigate()
+  const [notes, setNotes] = useState<LabNote[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
-  const handleLogout = () => {
-    logout()
-    navigate('/admin/login')
+  const fetchNotes = async () => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      const response = await adminLabNotesService.getAll(100)
+      setNotes(response.data)
+    } catch (err) {
+      setError('Failed to load notes')
+    } finally {
+      setIsLoading(false)
+    }
   }
+
+  useEffect(() => {
+    fetchNotes()
+  }, [])
 
   const handleDelete = async (id: string, title: string) => {
     if (!confirm(`Delete "${title}"?`)) return
@@ -23,7 +35,7 @@ export default function AdminNotesList() {
     setDeletingId(id)
     try {
       await adminLabNotesService.delete(id)
-      refetch()
+      fetchNotes()
     } catch (err) {
       alert('Failed to delete note')
     } finally {
@@ -68,7 +80,7 @@ export default function AdminNotesList() {
           <div className="py-16 text-center">
             <p className="text-zinc-faded">Failed to load notes</p>
             <button
-              onClick={() => refetch()}
+              onClick={() => fetchNotes()}
               className="mt-4 font-mono text-xs uppercase tracking-widest text-sage hover:underline"
             >
               Try again
@@ -99,9 +111,8 @@ export default function AdminNotesList() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-3 mb-1">
                     <h2 className="font-serif text-lg truncate">{note.title}</h2>
-                    {/* Note: published status would need to come from API */}
                   </div>
-                  <div className="flex items-center gap-3 text-xs text-zinc-400">
+                  <div className="flex items-center gap-3 text-xs text-zinc-400 flex-wrap">
                     <span className="font-mono uppercase tracking-widest">
                       {new Date(note.date).toLocaleDateString()}
                     </span>
@@ -109,6 +120,12 @@ export default function AdminNotesList() {
                     <span className="font-mono">{note.readTime}</span>
                     <span>·</span>
                     <span className="truncate">{note.tags.join(', ')}</span>
+                    {!note.published && (
+                      <>
+                        <span>·</span>
+                        <span className="text-amber-600 dark:text-amber-500">Draft</span>
+                      </>
+                    )}
                   </div>
                 </div>
 
