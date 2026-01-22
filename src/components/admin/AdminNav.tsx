@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { FileText, FolderKanban, LogOut } from 'lucide-react'
+import ThemeToggle from '../ui/ThemeToggle'
 
 export default function AdminNav() {
   const location = useLocation()
@@ -76,6 +77,7 @@ export default function AdminNav() {
             >
               View Site
             </a>
+            <ThemeToggle />
             <button
               onClick={handleLogout}
               className="p-2 text-zinc-400 hover:text-ink dark:hover:text-white transition-colors"
