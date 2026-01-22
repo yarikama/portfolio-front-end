@@ -1,6 +1,6 @@
 import type { ApiError } from '../../types'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.yarikama.com/v1'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.yarikama.com/api/v1'
 
 export class ApiClient {
   private baseUrl: string
@@ -50,17 +50,20 @@ export class ApiClient {
   }
 
   async get<T>(endpoint: string, params?: Record<string, string | number | boolean | undefined>): Promise<T> {
-    const url = new URL(`${this.baseUrl}${endpoint}`)
+    let finalEndpoint = endpoint
 
     if (params) {
+      const searchParams = new URLSearchParams()
       Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined) {
-          url.searchParams.append(key, String(value))
+          searchParams.append(key, String(value))
         }
       })
+      const queryString = searchParams.toString()
+      finalEndpoint = queryString ? `${endpoint}?${queryString}` : endpoint
     }
 
-    return this.request<T>(url.pathname + url.search)
+    return this.request<T>(finalEndpoint)
   }
 
   async post<T>(endpoint: string, data?: unknown): Promise<T> {
