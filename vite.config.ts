@@ -6,5 +6,6 @@ export default defineConfig({
   publicDir: 'public',
   build: {
     copyPublicDir: true,
+    chunkSizeWarningLimit: 1500,
   },
 })
