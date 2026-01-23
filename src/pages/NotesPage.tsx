@@ -87,7 +87,7 @@ export default function NotesPage() {
             </p>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="flex flex-col gap-8">
             {notes.map((note, index) => (
               <Link
                 key={note.id}
@@ -108,7 +108,7 @@ export default function NotesPage() {
                     </span>
                   </div>
 
-                  <h2 className="font-serif text-2xl font-light tracking-tight group-hover:italic transition-all duration-300 mb-3">
+                  <h2 className="font-serif text-2xl font-light tracking-tight transition-all duration-300 mb-3">
                     {note.title}
                   </h2>
 
