@@ -1,6 +1,7 @@
 import { useParams, Link } from 'react-router-dom'
 import Section from '../components/layout/Section'
 import MagazineLine from '../components/ui/MagazineLine'
+import MarkdownRenderer from '../components/ui/MarkdownRenderer'
 import { useLabNote } from '../hooks'
 import { ArrowLeft, Loader2 } from 'lucide-react'
 
@@ -89,16 +90,7 @@ export default function NotePage() {
 
           <MagazineLine className="mb-12" />
 
-          <div
-            className="prose prose-zinc dark:prose-invert max-w-none
-              prose-headings:font-serif prose-headings:font-light
-              prose-p:text-zinc-faded prose-p:leading-relaxed
-              prose-a:text-sage prose-a:no-underline hover:prose-a:underline
-              prose-code:font-mono prose-code:text-sm
-              prose-pre:bg-zinc-100 dark:prose-pre:bg-zinc-900
-            "
-            dangerouslySetInnerHTML={{ __html: note.content }}
-          />
+          <MarkdownRenderer content={note.content} />
         </article>
 
         <MagazineLine className="mt-16 mb-8" />
