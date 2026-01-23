@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { adminLabNotesService } from '../../services/api'
-import { Plus, Edit, Trash2, Loader2, Eye } from 'lucide-react'
+import { Plus, Edit, Trash2, Loader2, Eye, Search } from 'lucide-react'
 import AdminNav from '../../components/admin/AdminNav'
 import type { LabNote } from '../../types'
 
@@ -11,6 +11,13 @@ export default function AdminNotesList() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const filteredNotes = useMemo(() => {
+    if (!searchQuery.trim()) return notes
+    const query = searchQuery.toLowerCase()
+    return notes.filter((note) => note.title.toLowerCase().includes(query))
+  }, [notes, searchQuery])
 
   const fetchNotes = async () => {
     setIsLoading(true)
@@ -71,6 +78,27 @@ export default function AdminNotesList() {
 
       {/* Content */}
       <main className="max-w-5xl mx-auto px-6 py-8">
+        {/* Search */}
+        <div className="mb-6">
+          <div className="relative">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+            <input
+              type="text"
+              placeholder="Search by title..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="
+                w-full pl-10 pr-4 py-2
+                bg-transparent border border-zinc-200 dark:border-zinc-800
+                font-mono text-sm
+                placeholder:text-zinc-400
+                focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600
+                transition-colors
+              "
+            />
+          </div>
+        </div>
+
         {isLoading ? (
           <div className="py-16 flex flex-col items-center justify-center">
             <Loader2 className="w-8 h-8 animate-spin text-zinc-400 mb-4" />
@@ -97,9 +125,19 @@ export default function AdminNotesList() {
               Create your first note
             </Link>
           </div>
+        ) : filteredNotes.length === 0 ? (
+          <div className="py-16 text-center">
+            <p className="font-serif text-xl text-zinc-faded italic mb-4">No matching notes</p>
+            <button
+              onClick={() => setSearchQuery('')}
+              className="font-mono text-xs uppercase tracking-widest text-sage hover:underline"
+            >
+              Clear search
+            </button>
+          </div>
         ) : (
           <div className="space-y-4">
-            {notes.map((note) => (
+            {filteredNotes.map((note) => (
               <div
                 key={note.id}
                 className="

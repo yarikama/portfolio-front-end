@@ -79,7 +79,7 @@ export default function Manifest() {
             <div className="flex items-baseline gap-6">
               <span className="font-mono text-sm text-zinc-400">{principle.number}</span>
               <div className="flex-1">
-                <h3 className="font-serif text-2xl font-light tracking-tight group-hover:italic transition-all duration-300 mb-3">
+                <h3 className="font-serif text-2xl font-light tracking-tight transition-all duration-300 mb-3">
                   {principle.title}
                 </h3>
                 <p className="text-zinc-faded leading-relaxed">{principle.description}</p>

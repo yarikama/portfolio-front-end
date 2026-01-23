@@ -12,7 +12,7 @@ export default function NotePage() {
   if (isLoading) {
     return (
       <div className="pt-24">
-        <Section narrow>
+        <Section>
           <div className="py-32 flex flex-col items-center justify-center">
             <Loader2 className="w-8 h-8 animate-spin text-zinc-400 mb-4" />
             <p className="text-sm text-zinc-400">Loading article...</p>
@@ -25,7 +25,7 @@ export default function NotePage() {
   if (error || !note) {
     return (
       <div className="pt-24">
-        <Section narrow>
+        <Section>
           <Link
             to="/notes"
             className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-zinc-faded hover:text-ink transition-colors mb-12"
@@ -47,7 +47,7 @@ export default function NotePage() {
 
   return (
     <div className="pt-24">
-      <Section narrow>
+      <Section>
         <Link
           to="/notes"
           className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-zinc-faded hover:text-ink transition-colors mb-12"

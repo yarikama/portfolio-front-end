@@ -31,7 +31,7 @@ export default function ProjectCard({ project, index, featured = false }: Projec
             <h3
               className={`
                 font-serif font-light tracking-tight
-                group-hover:italic transition-all duration-300
+                transition-all duration-300
                 ${featured ? 'text-3xl md:text-4xl' : 'text-xl md:text-2xl'}
               `}
             >
