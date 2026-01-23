@@ -50,6 +50,10 @@ export const adminLabNotesService = {
     return authFetch<{ data: LabNote[] }>(`${API_BASE_URL}/admin/lab-notes?limit=${limit}`)
   },
 
+  async getById(id: string): Promise<ApiResponse<LabNote>> {
+    return authFetch<ApiResponse<LabNote>>(`${API_BASE_URL}/admin/lab-notes/${id}`)
+  },
+
   async create(data: CreateLabNoteData): Promise<ApiResponse<LabNote>> {
     return authFetch<ApiResponse<LabNote>>(`${API_BASE_URL}/admin/lab-notes`, {
       method: 'POST',

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate, useLocation, Link } from 'react-router-dom'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import { adminLabNotesService, type CreateLabNoteData } from '../../services/api'
-import { ArrowLeft, Save, Loader2, Eye } from 'lucide-react'
+import { ArrowLeft, Save, Loader2, Eye, Columns, Square } from 'lucide-react'
 import AdminNav from '../../components/admin/AdminNav'
-import type { LabNote } from '../../types'
+import MarkdownRenderer from '../../components/ui/MarkdownRenderer'
 
 function generateSlug(title: string): string {
   return title
@@ -24,11 +24,7 @@ function estimateReadTime(content: string): string {
 export default function NoteEditor() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const location = useLocation()
   const isEditing = Boolean(id)
-
-  // Get note data from location state (passed from list page)
-  const noteFromState = location.state?.note as LabNote | undefined
 
   const [formData, setFormData] = useState<CreateLabNoteData>({
     title: '',
@@ -42,35 +38,40 @@ export default function NoteEditor() {
   })
   const [tagsInput, setTagsInput] = useState('')
   const [isSaving, setIsSaving] = useState(false)
-  const [isLoadingNote, setIsLoadingNote] = useState(false)
+  const [isLoadingNote, setIsLoadingNote] = useState(isEditing)
   const [error, setError] = useState<string | null>(null)
   const [autoSlug, setAutoSlug] = useState(true)
+  const [showPreview, setShowPreview] = useState(true)
 
-  // Load existing note for editing
+  // Load existing note for editing - always fetch from API to get full content
   useEffect(() => {
     if (isEditing && id) {
-      // If we have note data from location state, use it directly
-      if (noteFromState && noteFromState.id === id) {
-        setFormData({
-          title: noteFromState.title,
-          slug: noteFromState.slug,
-          excerpt: noteFromState.excerpt,
-          content: noteFromState.content,
-          tags: noteFromState.tags,
-          readTime: noteFromState.readTime,
-          date: noteFromState.date,
-          published: noteFromState.published,
+      setIsLoadingNote(true)
+      adminLabNotesService
+        .getById(id)
+        .then((response) => {
+          const note = response.data
+          setFormData({
+            title: note.title,
+            slug: note.slug,
+            excerpt: note.excerpt,
+            content: note.content,
+            tags: note.tags,
+            readTime: note.readTime,
+            date: note.date,
+            published: note.published,
+          })
+          setTagsInput(note.tags.join(', '))
+          setAutoSlug(false)
         })
-        setTagsInput(noteFromState.tags.join(', '))
-        setAutoSlug(false)
-        setIsLoadingNote(false)
-      } else {
-        // Otherwise fetch from API using slug (need to navigate back or show error)
-        setError('Note data not found. Please go back to the notes list.')
-        setIsLoadingNote(false)
-      }
+        .catch((err) => {
+          setError(err instanceof Error ? err.message : 'Failed to load note')
+        })
+        .finally(() => {
+          setIsLoadingNote(false)
+        })
     }
-  }, [id, isEditing, noteFromState])
+  }, [id, isEditing])
 
   const handleTitleChange = (title: string) => {
     setFormData((prev) => ({
@@ -130,7 +131,7 @@ export default function NoteEditor() {
 
       {/* Header */}
       <header className="border-b border-zinc-200 dark:border-zinc-800 sticky top-0 bg-paper dark:bg-[#0f0f0f] z-10">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
               to="/admin/notes"
@@ -143,9 +144,9 @@ export default function NoteEditor() {
             </h1>
           </div>
           <div className="flex items-center gap-3">
-            {isEditing && noteFromState && (
+            {isEditing && formData.slug && (
               <Link
-                to={`/notes/${noteFromState.slug}`}
+                to={`/notes/${formData.slug}`}
                 target="_blank"
                 className="p-2 text-zinc-faded hover:text-ink transition-colors"
                 title="Preview"
@@ -177,7 +178,7 @@ export default function NoteEditor() {
       </header>
 
       {/* Form */}
-      <main className="max-w-4xl mx-auto px-6 py-8">
+      <main className="max-w-6xl mx-auto px-6 py-8">
         {error && (
           <div className="mb-6 p-4 border border-red-300 bg-red-50 dark:bg-red-900/20 dark:border-red-800">
             <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
@@ -309,25 +310,50 @@ export default function NoteEditor() {
             />
           </div>
 
-          {/* Content */}
+          {/* Content with Preview */}
           <div>
-            <label className="block font-mono text-xs uppercase tracking-widest text-zinc-400 mb-2">
-              Content (Markdown)
-              <span className="ml-2 normal-case text-zinc-500">· {formData.readTime}</span>
-            </label>
-            <textarea
-              value={formData.content}
-              onChange={(e) => handleContentChange(e.target.value)}
-              required
-              rows={20}
-              className="
-                w-full px-4 py-3 bg-transparent border border-zinc-200 dark:border-zinc-700
-                font-mono text-sm leading-relaxed resize-y
-                focus:outline-none focus:border-ink dark:focus:border-zinc-400
-                transition-colors
-              "
-              placeholder="# Your article content in Markdown..."
-            />
+            <div className="flex items-center justify-between mb-2">
+              <label className="font-mono text-xs uppercase tracking-widest text-zinc-400">
+                Content (Markdown)
+                <span className="ml-2 normal-case text-zinc-500">· {formData.readTime}</span>
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowPreview(!showPreview)}
+                className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-zinc-400 hover:text-ink transition-colors"
+              >
+                {showPreview ? <Square size={14} /> : <Columns size={14} />}
+                {showPreview ? 'Editor Only' : 'Show Preview'}
+              </button>
+            </div>
+
+            <div className={`grid gap-4 ${showPreview ? 'grid-cols-2' : 'grid-cols-1'}`}>
+              {/* Editor */}
+              <textarea
+                value={formData.content}
+                onChange={(e) => handleContentChange(e.target.value)}
+                required
+                rows={25}
+                className="
+                  w-full px-4 py-3 bg-transparent border border-zinc-200 dark:border-zinc-700
+                  font-mono text-sm leading-relaxed resize-y
+                  focus:outline-none focus:border-ink dark:focus:border-zinc-400
+                  transition-colors
+                "
+                placeholder="# Your article content in Markdown..."
+              />
+
+              {/* Preview */}
+              {showPreview && (
+                <div className="border border-zinc-200 dark:border-zinc-700 p-4 overflow-y-auto max-h-[600px] bg-white dark:bg-zinc-900/50 rounded">
+                  {formData.content ? (
+                    <MarkdownRenderer content={formData.content} />
+                  ) : (
+                    <p className="text-zinc-400 italic">Preview will appear here...</p>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </form>
       </main>
