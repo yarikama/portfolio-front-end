@@ -35,7 +35,7 @@ export function useProjects(params?: ProjectsQueryParams) {
         error: error instanceof Error ? error : new Error('Failed to fetch projects'),
       }))
     }
-  }, [params?.category, params?.featured, params?.tag, params?.limit, params?.offset])
+  }, [params?.category_id, params?.featured, params?.tag, params?.limit, params?.offset])
 
   useEffect(() => {
     fetchProjects()
