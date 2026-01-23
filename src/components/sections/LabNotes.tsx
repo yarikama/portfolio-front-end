@@ -56,7 +56,7 @@ export default function LabNotes() {
                   <span className="font-mono text-sm text-zinc-400 shrink-0">
                     {String(index + 1).padStart(2, '0')}
                   </span>
-                  <h3 className="font-serif text-xl md:text-2xl font-light tracking-tight group-hover:italic transition-all duration-300 truncate">
+                  <h3 className="font-serif text-xl md:text-2xl font-light tracking-tight transition-all duration-300 truncate">
                     {note.title}
                   </h3>
                 </div>

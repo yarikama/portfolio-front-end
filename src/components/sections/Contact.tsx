@@ -289,7 +289,7 @@ export default function Contact() {
                   <p className="font-mono text-sm text-zinc-400 uppercase tracking-widest mb-2">
                     {link.label}
                   </p>
-                  <p className="font-serif text-lg group-hover:italic transition-all duration-300">
+                  <p className="font-serif text-lg transition-all duration-300">
                     {link.value}
                   </p>
                 </div>

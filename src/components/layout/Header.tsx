@@ -86,9 +86,9 @@ export default function Header() {
         <nav className="flex items-center justify-between py-6">
           <Link
             to="/"
-            className="font-serif text-xl font-light tracking-tight hover:italic transition-all duration-300"
+            className="font-serif text-xl font-light tracking-tight transition-all duration-300"
           >
-            HH
+            &lt;H,H&gt;
           </Link>
 
           <ul className="hidden md:flex items-center gap-8">

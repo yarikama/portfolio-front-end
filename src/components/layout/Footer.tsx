@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import Container from './Container'
 import { Github, Linkedin, Mail } from 'lucide-react'
 
@@ -9,9 +10,9 @@ export default function Footer() {
       <Container>
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="font-mono text-sm text-zinc-faded uppercase tracking-widest">
-            <span className="font-serif text-sm normal-case tracking-normal italic">
+            <Link to="/admin" className="font-serif text-sm normal-case tracking-normal italic hover:text-sage transition-colors duration-300">
               Henry Hsu
-            </span>
+            </Link>
             <span className="mx-3">/</span>
             <span>{currentYear}</span>
           </div>
