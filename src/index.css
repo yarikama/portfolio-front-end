@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -367,4 +368,24 @@ body.dark {
 
 .animate-nudge {
   animation: nudge 0.8s ease-in-out;
+}
+
+/* Markdown Chinese Typography */
+.prose {
+  font-family: var(--font-sans), var(--font-serif-tc);
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  font-family: var(--font-serif), var(--font-serif-tc);
+}
+
+.prose p,
+.prose li,
+.prose blockquote {
+  font-family: var(--font-sans), var(--font-serif-tc);
 }
