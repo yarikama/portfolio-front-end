@@ -120,7 +120,7 @@ export default function AdminProjectsList() {
                   </p>
                   <div className="flex items-center gap-3 text-xs text-zinc-400 flex-wrap">
                     <span className="font-mono uppercase tracking-widest">
-                      {project.category}
+                      {project.category.label}
                     </span>
                     <span>·</span>
                     <span className="font-mono">{project.year}</span>

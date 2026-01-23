@@ -52,6 +52,40 @@ export interface LabNoteListItem {
   updatedAt: string
 }
 
+// Category Types
+export interface Category {
+  id: string
+  name: string
+  label: string
+  description: string | null
+  order: number
+  created_at: string
+  updated_at: string
+}
+
+export interface CategoryWithCount extends Category {
+  count: number
+}
+
+export interface CategoryCreate {
+  name: string
+  label: string
+  description?: string
+  order?: number
+}
+
+export interface CategoryUpdate {
+  name?: string
+  label?: string
+  description?: string
+  order?: number
+}
+
+export interface CategoryReorderItem {
+  id: string
+  order: number
+}
+
 // Projects Types (API response)
 export interface Project {
   id: string
@@ -59,7 +93,7 @@ export interface Project {
   title: string
   description: string
   tags: string[]
-  category: 'engineering' | 'ml'
+  category: Category
   year: string
   link?: string | null
   github?: string | null
@@ -68,12 +102,13 @@ export interface Project {
   featured: boolean
   order: number
   published?: boolean
-  createdAt: string
-  updatedAt: string
+  created_at: string
+  updated_at: string
 }
 
 export interface ProjectCategory {
   id: string
+  name: string
   label: string
   count: number
 }
@@ -116,7 +151,7 @@ export interface LabNotesQueryParams {
 }
 
 export interface ProjectsQueryParams {
-  category?: 'engineering' | 'ml'
+  category_id?: string
   featured?: boolean
   tag?: string
   limit?: number

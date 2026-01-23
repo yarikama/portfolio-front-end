@@ -26,7 +26,7 @@ export const projectsService = {
    * Get all project categories with counts
    */
   async getCategories(): Promise<ApiResponse<ProjectCategory[]>> {
-    return apiClient.get<ApiResponse<ProjectCategory[]>>('/projects/categories')
+    return apiClient.get<ApiResponse<ProjectCategory[]>>('/categories', { include_counts: true })
   },
 
   /**

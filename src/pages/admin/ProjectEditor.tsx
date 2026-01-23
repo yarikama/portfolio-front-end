@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, useLocation, Link } from 'react-router-dom'
-import { adminProjectsService, type CreateProjectData } from '../../services/api'
+import { adminProjectsService, projectsService, type CreateProjectData } from '../../services/api'
 import { ArrowLeft, Save, Loader2, ExternalLink } from 'lucide-react'
 import AdminNav from '../../components/admin/AdminNav'
-import type { Project } from '../../types'
+import type { Project, ProjectCategory } from '../../types'
 
 function generateSlug(title: string): string {
   return title
@@ -28,7 +28,7 @@ export default function ProjectEditor() {
     title: '',
     description: '',
     tags: [],
-    category: 'engineering',
+    category_id: '',
     year: new Date().getFullYear().toString(),
     link: '',
     github: '',
@@ -38,11 +38,31 @@ export default function ProjectEditor() {
     order: 0,
     published: false,
   })
+  const [categories, setCategories] = useState<ProjectCategory[]>([])
   const [tagsInput, setTagsInput] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [isLoadingProject, setIsLoadingProject] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [autoSlug, setAutoSlug] = useState(true)
+
+  // Fetch categories on mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await projectsService.getCategories()
+        // Filter out 'all' category for the dropdown
+        const filteredCategories = response.data.filter((c) => c.name !== 'all')
+        setCategories(filteredCategories)
+        // Set default category_id if not editing
+        if (!isEditing && filteredCategories.length > 0) {
+          setFormData((prev) => ({ ...prev, category_id: filteredCategories[0].id }))
+        }
+      } catch (err) {
+        console.error('Failed to fetch categories:', err)
+      }
+    }
+    fetchCategories()
+  }, [isEditing])
 
   // Load existing project for editing
   useEffect(() => {
@@ -54,7 +74,7 @@ export default function ProjectEditor() {
           title: projectFromState.title,
           description: projectFromState.description,
           tags: projectFromState.tags,
-          category: projectFromState.category,
+          category_id: projectFromState.category.id,
           year: projectFromState.year,
           link: projectFromState.link || '',
           github: projectFromState.github || '',
@@ -238,11 +258,11 @@ export default function ProjectEditor() {
                 Category
               </label>
               <select
-                value={formData.category}
+                value={formData.category_id}
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,
-                    category: e.target.value as 'engineering' | 'ml',
+                    category_id: e.target.value,
                   }))
                 }
                 required
@@ -253,8 +273,11 @@ export default function ProjectEditor() {
                   transition-colors
                 "
               >
-                <option value="engineering">Engineering</option>
-                <option value="ml">ML</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.label}
+                  </option>
+                ))}
               </select>
             </div>
             <div>

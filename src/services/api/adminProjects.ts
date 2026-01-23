@@ -7,7 +7,7 @@ export interface CreateProjectData {
   title: string
   description: string
   tags: string[]
-  category: 'engineering' | 'ml'
+  category_id: string
   year: string
   link?: string
   github?: string

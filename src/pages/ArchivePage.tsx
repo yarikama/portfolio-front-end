@@ -7,9 +7,9 @@ import { useProjects, useProjectCategories } from '../hooks'
 import { ArrowLeft, Loader2 } from 'lucide-react'
 
 const fallbackCategories = [
-  { id: 'all', label: 'All', count: 0 },
-  { id: 'engineering', label: 'Engineering', count: 0 },
-  { id: 'ml', label: 'ML/AI', count: 0 },
+  { id: 'all', name: 'all', label: 'All', count: 0 },
+  { id: 'engineering', name: 'engineering', label: 'Engineering', count: 0 },
+  { id: 'ml', name: 'ml', label: 'ML/AI', count: 0 },
 ]
 
 export default function ArchivePage() {
@@ -28,7 +28,7 @@ export default function ArchivePage() {
     if (activeCategory === 'all') {
       return projects
     }
-    return projects.filter((p) => p.category === activeCategory)
+    return projects.filter((p) => p.category.name === activeCategory)
   }, [projects, activeCategory])
 
   return (
@@ -59,12 +59,12 @@ export default function ArchivePage() {
           {categories.map((category) => (
             <button
               key={category.id}
-              onClick={() => setActiveCategory(category.id)}
+              onClick={() => setActiveCategory(category.name)}
               className={`
                 font-mono text-xs uppercase tracking-widest
                 px-4 py-2 border transition-all duration-300
                 ${
-                  activeCategory === category.id
+                  activeCategory === category.name
                     ? 'border-ink text-ink bg-ink/5 dark:border-zinc-400 dark:bg-zinc-400/10'
                     : 'border-zinc-200 dark:border-zinc-200/20 text-zinc-faded hover:border-zinc-400 hover:text-ink'
                 }
