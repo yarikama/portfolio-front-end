@@ -95,6 +95,7 @@ export interface Project {
   tags: string[]
   category: Category
   year: string
+  cover_image?: string | null
   link?: string | null
   github?: string | null
   metrics?: string | null
@@ -157,4 +158,14 @@ export interface ProjectsQueryParams {
   limit?: number
   offset?: number
   [key: string]: string | number | boolean | undefined
+}
+
+// Upload Types
+export interface UploadResponse {
+  url: string
+  filename: string
+}
+
+export interface UploadDeleteResponse {
+  message: string
 }

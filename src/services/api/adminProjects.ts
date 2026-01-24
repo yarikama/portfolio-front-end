@@ -9,6 +9,7 @@ export interface CreateProjectData {
   tags: string[]
   category_id: string
   year: string
+  cover_image?: string
   link?: string
   github?: string
   metrics?: string
