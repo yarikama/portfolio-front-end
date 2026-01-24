@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate, useLocation, Link } from 'react-router-dom'
 import { adminProjectsService, projectsService, uploadService, type CreateProjectData } from '../../services/api'
-import { ArrowLeft, Save, Loader2, ExternalLink, Upload, X, Image } from 'lucide-react'
+import { ArrowLeft, Save, Loader2, ExternalLink, X, Image } from 'lucide-react'
 import AdminNav from '../../components/admin/AdminNav'
 import type { Project, CategoryWithCount } from '../../types'
 
@@ -309,18 +309,24 @@ export default function ProjectEditor() {
                   }))
                 }
                 required
+                disabled={categories.length === 0}
                 className="
                   w-full px-4 py-3 bg-transparent border border-zinc-200 dark:border-zinc-700
                   font-mono text-sm
                   focus:outline-none focus:border-ink dark:focus:border-zinc-400
                   transition-colors
+                  disabled:opacity-50 disabled:cursor-not-allowed
                 "
               >
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.label}
-                  </option>
-                ))}
+                {categories.length === 0 ? (
+                  <option value="">Loading categories...</option>
+                ) : (
+                  categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.label}
+                    </option>
+                  ))
+                )}
               </select>
             </div>
             <div>

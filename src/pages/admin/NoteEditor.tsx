@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { adminLabNotesService, type CreateLabNoteData } from '../../services/api'
-import { ArrowLeft, Save, Loader2, Eye, Columns, Square } from 'lucide-react'
+import { adminLabNotesService, uploadService, type CreateLabNoteData } from '../../services/api'
+import { ArrowLeft, Save, Loader2, Eye, Columns, Square, ImagePlus } from 'lucide-react'
 import AdminNav from '../../components/admin/AdminNav'
 import MarkdownRenderer from '../../components/ui/MarkdownRenderer'
 
@@ -39,9 +39,13 @@ export default function NoteEditor() {
   const [tagsInput, setTagsInput] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [isLoadingNote, setIsLoadingNote] = useState(isEditing)
+  const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [autoSlug, setAutoSlug] = useState(true)
   const [showPreview, setShowPreview] = useState(true)
+  const [isDragging, setIsDragging] = useState(false)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Load existing note for editing - always fetch from API to get full content
   useEffect(() => {
@@ -96,6 +100,97 @@ export default function NoteEditor() {
       .map((t) => t.trim())
       .filter(Boolean)
     setFormData((prev) => ({ ...prev, tags }))
+  }
+
+  // Insert text at cursor position in textarea
+  const insertAtCursor = (text: string) => {
+    const textarea = textareaRef.current
+    if (!textarea) return
+
+    const start = textarea.selectionStart
+    const end = textarea.selectionEnd
+    const before = formData.content.substring(0, start)
+    const after = formData.content.substring(end)
+    const newContent = before + text + after
+
+    handleContentChange(newContent)
+
+    // Restore cursor position after the inserted text
+    setTimeout(() => {
+      textarea.focus()
+      textarea.selectionStart = textarea.selectionEnd = start + text.length
+    }, 0)
+  }
+
+  // Handle image upload
+  const handleImageUpload = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      setError('Please select an image file')
+      return
+    }
+
+    setIsUploading(true)
+    setError(null)
+
+    try {
+      const result = await uploadService.uploadImage(file, 'notes')
+      const markdown = `![${file.name}](${result.url})`
+      insertAtCursor(markdown)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to upload image')
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
+  // Handle file input change
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      handleImageUpload(file)
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
+
+  // Handle drag events
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(true)
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
+
+    const file = e.dataTransfer.files[0]
+    if (file && file.type.startsWith('image/')) {
+      handleImageUpload(file)
+    }
+  }
+
+  // Handle paste event
+  const handlePaste = (e: React.ClipboardEvent) => {
+    const items = e.clipboardData.items
+    for (const item of items) {
+      if (item.type.startsWith('image/')) {
+        e.preventDefault()
+        const file = item.getAsFile()
+        if (file) {
+          handleImageUpload(file)
+        }
+        break
+      }
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -317,31 +412,80 @@ export default function NoteEditor() {
                 Content (Markdown)
                 <span className="ml-2 normal-case text-zinc-500">· {formData.readTime}</span>
               </label>
-              <button
-                type="button"
-                onClick={() => setShowPreview(!showPreview)}
-                className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-zinc-400 hover:text-ink transition-colors"
-              >
-                {showPreview ? <Square size={14} /> : <Columns size={14} />}
-                {showPreview ? 'Editor Only' : 'Show Preview'}
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                  className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-zinc-400 hover:text-ink transition-colors disabled:opacity-50"
+                  title="Upload image"
+                >
+                  {isUploading ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <ImagePlus size={14} />
+                  )}
+                  {isUploading ? 'Uploading...' : 'Add Image'}
+                </button>
+                <span className="text-zinc-300 dark:text-zinc-600">|</span>
+                <button
+                  type="button"
+                  onClick={() => setShowPreview(!showPreview)}
+                  className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-zinc-400 hover:text-ink transition-colors"
+                >
+                  {showPreview ? <Square size={14} /> : <Columns size={14} />}
+                  {showPreview ? 'Editor Only' : 'Show Preview'}
+                </button>
+              </div>
             </div>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/gif,image/webp"
+              onChange={handleFileInputChange}
+              className="hidden"
+            />
 
             <div className={`grid gap-4 ${showPreview ? 'grid-cols-2' : 'grid-cols-1'}`}>
               {/* Editor */}
-              <textarea
-                value={formData.content}
-                onChange={(e) => handleContentChange(e.target.value)}
-                required
-                rows={25}
-                className="
-                  w-full px-4 py-3 bg-transparent border border-zinc-200 dark:border-zinc-700
-                  font-mono text-sm leading-relaxed resize-y
-                  focus:outline-none focus:border-ink dark:focus:border-zinc-400
-                  transition-colors
-                "
-                placeholder="# Your article content in Markdown..."
-              />
+              <div
+                className="relative"
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+              >
+                <textarea
+                  ref={textareaRef}
+                  value={formData.content}
+                  onChange={(e) => handleContentChange(e.target.value)}
+                  onPaste={handlePaste}
+                  required
+                  rows={25}
+                  className={`
+                    w-full px-4 py-3 bg-transparent border
+                    font-mono text-sm leading-relaxed resize-y
+                    focus:outline-none transition-colors
+                    ${isDragging
+                      ? 'border-sage border-2 bg-sage/5'
+                      : 'border-zinc-200 dark:border-zinc-700 focus:border-ink dark:focus:border-zinc-400'
+                    }
+                  `}
+                  placeholder="# Your article content in Markdown...
+
+Tip: Drag & drop or paste images directly here"
+                />
+                {isDragging && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-sage/10 border-2 border-dashed border-sage pointer-events-none">
+                    <div className="flex flex-col items-center gap-2 text-sage">
+                      <ImagePlus size={32} />
+                      <span className="font-mono text-xs uppercase tracking-widest">
+                        Drop image here
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {/* Preview */}
               {showPreview && (
