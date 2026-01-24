@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation, Link } from 'react-router-dom'
 import { adminProjectsService, projectsService, type CreateProjectData } from '../../services/api'
 import { ArrowLeft, Save, Loader2, ExternalLink } from 'lucide-react'
 import AdminNav from '../../components/admin/AdminNav'
-import type { Project, ProjectCategory } from '../../types'
+import type { Project, CategoryWithCount } from '../../types'
 
 function generateSlug(title: string): string {
   return title
@@ -38,7 +38,7 @@ export default function ProjectEditor() {
     order: 0,
     published: false,
   })
-  const [categories, setCategories] = useState<ProjectCategory[]>([])
+  const [categories, setCategories] = useState<CategoryWithCount[]>([])
   const [tagsInput, setTagsInput] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [isLoadingProject, setIsLoadingProject] = useState(false)

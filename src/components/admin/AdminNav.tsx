@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
-import { FileText, FolderKanban, LogOut } from 'lucide-react'
+import { FileText, FolderKanban, Tags, LogOut } from 'lucide-react'
 import ThemeToggle from '../ui/ThemeToggle'
 
 export default function AdminNav() {
@@ -63,6 +63,22 @@ export default function AdminNav() {
               >
                 <FolderKanban size={14} />
                 Projects
+              </Link>
+              <Link
+                to="/admin/categories"
+                className={`
+                  inline-flex items-center gap-2 px-4 py-2
+                  font-mono text-xs uppercase tracking-widest
+                  transition-colors rounded
+                  ${
+                    isActive('/admin/categories')
+                      ? 'bg-zinc-100 dark:bg-zinc-800 text-ink dark:text-white'
+                      : 'text-zinc-500 hover:text-ink dark:hover:text-white'
+                  }
+                `}
+              >
+                <Tags size={14} />
+                Categories
               </Link>
             </div>
           </div>
