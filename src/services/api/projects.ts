@@ -3,7 +3,7 @@ import type {
   ApiResponse,
   PaginatedResponse,
   Project,
-  ProjectCategory,
+  CategoryWithCount,
   ProjectsQueryParams,
 } from '../../types'
 
@@ -25,8 +25,8 @@ export const projectsService = {
   /**
    * Get all project categories with counts
    */
-  async getCategories(): Promise<ApiResponse<ProjectCategory[]>> {
-    return apiClient.get<ApiResponse<ProjectCategory[]>>('/categories', { include_counts: true })
+  async getCategories(): Promise<ApiResponse<CategoryWithCount[]>> {
+    return apiClient.get<ApiResponse<CategoryWithCount[]>>('/categories', { include_counts: true })
   },
 
   /**

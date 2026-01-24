@@ -11,6 +11,8 @@ import {
   AdminNoteEditor,
   AdminProjectsList,
   AdminProjectEditor,
+  AdminCategoriesList,
+  AdminCategoryEditor,
 } from './pages/admin'
 
 function App() {
@@ -72,6 +74,30 @@ function App() {
           element={
             <ProtectedRoute>
               <AdminProjectEditor />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/categories"
+          element={
+            <ProtectedRoute>
+              <AdminCategoriesList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/categories/new"
+          element={
+            <ProtectedRoute>
+              <AdminCategoryEditor />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/categories/:id/edit"
+          element={
+            <ProtectedRoute>
+              <AdminCategoryEditor />
             </ProtectedRoute>
           }
         />
