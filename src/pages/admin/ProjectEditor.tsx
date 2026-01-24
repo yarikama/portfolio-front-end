@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate, useLocation, Link } from 'react-router-dom'
-import { adminProjectsService, projectsService, type CreateProjectData } from '../../services/api'
-import { ArrowLeft, Save, Loader2, ExternalLink } from 'lucide-react'
+import { adminProjectsService, projectsService, uploadService, type CreateProjectData } from '../../services/api'
+import { ArrowLeft, Save, Loader2, ExternalLink, Upload, X, Image } from 'lucide-react'
 import AdminNav from '../../components/admin/AdminNav'
 import type { Project, CategoryWithCount } from '../../types'
 
@@ -30,6 +30,7 @@ export default function ProjectEditor() {
     tags: [],
     category_id: '',
     year: new Date().getFullYear().toString(),
+    cover_image: '',
     link: '',
     github: '',
     metrics: '',
@@ -42,8 +43,10 @@ export default function ProjectEditor() {
   const [tagsInput, setTagsInput] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [isLoadingProject, setIsLoadingProject] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [autoSlug, setAutoSlug] = useState(true)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Fetch categories on mount
   useEffect(() => {
@@ -76,6 +79,7 @@ export default function ProjectEditor() {
           tags: projectFromState.tags,
           category_id: projectFromState.category.id,
           year: projectFromState.year,
+          cover_image: projectFromState.cover_image || '',
           link: projectFromState.link || '',
           github: projectFromState.github || '',
           metrics: projectFromState.metrics || '',
@@ -110,6 +114,45 @@ export default function ProjectEditor() {
       .map((t) => t.trim())
       .filter(Boolean)
     setFormData((prev) => ({ ...prev, tags }))
+  }
+
+  const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      setError('Please select an image file')
+      return
+    }
+
+    setIsUploading(true)
+    setError(null)
+
+    try {
+      const result = await uploadService.uploadImage(file, 'covers')
+      setFormData((prev) => ({ ...prev, cover_image: result.url }))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to upload image')
+    } finally {
+      setIsUploading(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }
+
+  const handleRemoveCover = async () => {
+    if (!formData.cover_image) return
+
+    if (!confirm('Remove cover image?')) return
+
+    try {
+      await uploadService.deleteImage(formData.cover_image)
+    } catch (err) {
+      console.error('Failed to delete image from storage:', err)
+    }
+
+    setFormData((prev) => ({ ...prev, cover_image: '' }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -368,6 +411,69 @@ export default function ProjectEditor() {
                 transition-colors
               "
               placeholder="React, TypeScript, Node.js"
+            />
+          </div>
+
+          {/* Cover Image */}
+          <div>
+            <label className="block font-mono text-xs uppercase tracking-widest text-zinc-400 mb-2">
+              Cover Image (optional)
+            </label>
+            {formData.cover_image ? (
+              <div className="relative border border-zinc-200 dark:border-zinc-700 p-2">
+                <img
+                  src={formData.cover_image}
+                  alt="Cover preview"
+                  className="w-full max-h-64 object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={handleRemoveCover}
+                  className="
+                    absolute top-4 right-4 p-2
+                    bg-black/50 hover:bg-black/70
+                    text-white rounded-full
+                    transition-colors
+                  "
+                  title="Remove cover"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            ) : (
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                className="
+                  border-2 border-dashed border-zinc-200 dark:border-zinc-700
+                  hover:border-zinc-400 dark:hover:border-zinc-500
+                  p-8 cursor-pointer transition-colors
+                  flex flex-col items-center justify-center gap-3
+                "
+              >
+                {isUploading ? (
+                  <>
+                    <Loader2 size={32} className="text-zinc-400 animate-spin" />
+                    <span className="font-mono text-xs text-zinc-400">Uploading...</span>
+                  </>
+                ) : (
+                  <>
+                    <Image size={32} className="text-zinc-400" />
+                    <span className="font-mono text-xs text-zinc-400">
+                      Click to upload cover image
+                    </span>
+                    <span className="font-mono text-xs text-zinc-300 dark:text-zinc-600">
+                      JPG, PNG, GIF, WebP
+                    </span>
+                  </>
+                )}
+              </div>
+            )}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/gif,image/webp"
+              onChange={handleCoverUpload}
+              className="hidden"
             />
           </div>
 

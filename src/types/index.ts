@@ -19,6 +19,8 @@ export type {
   ContactSubmitResponse,
   LabNotesQueryParams,
   ProjectsQueryParams,
+  UploadResponse,
+  UploadDeleteResponse,
 } from './api'
 
 // Local/static data types (for fallback data)
