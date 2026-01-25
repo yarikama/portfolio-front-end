@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { ArrowUpRight } from 'lucide-react'
 import MagazineLine from './MagazineLine'
 
@@ -7,6 +8,7 @@ interface ProjectCardData {
   title: string
   description: string
   tags: string[]
+  cover_image?: string | null
   link?: string | null
   metrics?: string | null
 }
@@ -19,10 +21,50 @@ interface ProjectCardProps {
 
 export default function ProjectCard({ project, index, featured = false }: ProjectCardProps) {
   const formattedIndex = String(index + 1).padStart(2, '0')
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const [isHovering, setIsHovering] = useState(false)
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!project.cover_image) return
+    setMousePosition({
+      x: e.clientX,
+      y: e.clientY,
+    })
+  }
 
   return (
-    <article className="group">
+    <article
+      className="group relative"
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+      onMouseMove={handleMouseMove}
+    >
       <MagazineLine className="mb-6" delay={index * 100} />
+
+      {/* Hover Image Preview */}
+      {project.cover_image && isHovering && (
+        <div
+          className="
+            pointer-events-none fixed z-50
+            w-48 h-32 md:w-64 md:h-44
+            rounded-lg overflow-hidden shadow-2xl
+            opacity-0 group-hover:opacity-100
+            transition-opacity duration-200
+            border border-zinc-200 dark:border-zinc-700
+          "
+          style={{
+            left: mousePosition.x + 20,
+            top: mousePosition.y - 80,
+            transform: 'translate(0, 0)',
+          }}
+        >
+          <img
+            src={project.cover_image}
+            alt={project.title}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
 
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
