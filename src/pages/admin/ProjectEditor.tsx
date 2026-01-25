@@ -28,9 +28,9 @@ export default function ProjectEditor() {
     title: '',
     description: '',
     tags: [],
-    category_id: '',
+    categoryId: '',
     year: new Date().getFullYear().toString(),
-    cover_image: '',
+    coverImage: '',
     link: '',
     github: '',
     metrics: '',
@@ -56,9 +56,9 @@ export default function ProjectEditor() {
         // Filter out 'all' category for the dropdown
         const filteredCategories = response.data.filter((c) => c.name !== 'all')
         setCategories(filteredCategories)
-        // Set default category_id if not editing
+        // Set default categoryId if not editing
         if (!isEditing && filteredCategories.length > 0) {
-          setFormData((prev) => ({ ...prev, category_id: filteredCategories[0].id }))
+          setFormData((prev) => ({ ...prev, categoryId: filteredCategories[0].id }))
         }
       } catch (err) {
         console.error('Failed to fetch categories:', err)
@@ -77,9 +77,9 @@ export default function ProjectEditor() {
           title: projectFromState.title,
           description: projectFromState.description,
           tags: projectFromState.tags,
-          category_id: projectFromState.category.id,
+          categoryId: projectFromState.category.id,
           year: projectFromState.year,
-          cover_image: projectFromState.cover_image || '',
+          coverImage: projectFromState.coverImage || '',
           link: projectFromState.link || '',
           github: projectFromState.github || '',
           metrics: projectFromState.metrics || '',
@@ -130,7 +130,9 @@ export default function ProjectEditor() {
 
     try {
       const result = await uploadService.uploadImage(file, 'covers')
-      setFormData((prev) => ({ ...prev, cover_image: result.url }))
+      console.log('Upload result:', result)
+      console.log('Setting coverImage to:', result.url)
+      setFormData((prev) => ({ ...prev, coverImage: result.url }))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to upload image')
     } finally {
@@ -142,23 +144,26 @@ export default function ProjectEditor() {
   }
 
   const handleRemoveCover = async () => {
-    if (!formData.cover_image) return
+    if (!formData.coverImage) return
 
     if (!confirm('Remove cover image?')) return
 
     try {
-      await uploadService.deleteImage(formData.cover_image)
+      await uploadService.deleteImage(formData.coverImage)
     } catch (err) {
       console.error('Failed to delete image from storage:', err)
     }
 
-    setFormData((prev) => ({ ...prev, cover_image: '' }))
+    setFormData((prev) => ({ ...prev, coverImage: '' }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
     setIsSaving(true)
+
+    console.log('Submitting formData:', formData)
+    console.log('coverImage:', formData.coverImage)
 
     try {
       if (isEditing && id) {
@@ -301,11 +306,11 @@ export default function ProjectEditor() {
                 Category
               </label>
               <select
-                value={formData.category_id}
+                value={formData.categoryId}
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,
-                    category_id: e.target.value,
+                    categoryId: e.target.value,
                   }))
                 }
                 required
@@ -425,10 +430,10 @@ export default function ProjectEditor() {
             <label className="block font-mono text-xs uppercase tracking-widest text-zinc-400 mb-2">
               Cover Image (optional)
             </label>
-            {formData.cover_image ? (
+            {formData.coverImage ? (
               <div className="relative border border-zinc-200 dark:border-zinc-700 p-2">
                 <img
-                  src={formData.cover_image}
+                  src={formData.coverImage}
                   alt="Cover preview"
                   className="w-full max-h-64 object-cover"
                 />

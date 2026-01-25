@@ -8,7 +8,7 @@ interface ProjectCardData {
   title: string
   description: string
   tags: string[]
-  cover_image?: string | null
+  coverImage?: string | null
   link?: string | null
   metrics?: string | null
 }
@@ -25,7 +25,7 @@ export default function ProjectCard({ project, index, featured = false }: Projec
   const [isHovering, setIsHovering] = useState(false)
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!project.cover_image) return
+    if (!project.coverImage) return
     setMousePosition({
       x: e.clientX,
       y: e.clientY,
@@ -42,7 +42,7 @@ export default function ProjectCard({ project, index, featured = false }: Projec
       <MagazineLine className="mb-6" delay={index * 100} />
 
       {/* Hover Image Preview */}
-      {project.cover_image && isHovering && (
+      {project.coverImage && isHovering && (
         <div
           className="
             pointer-events-none fixed z-50
@@ -59,7 +59,7 @@ export default function ProjectCard({ project, index, featured = false }: Projec
           }}
         >
           <img
-            src={project.cover_image}
+            src={project.coverImage}
             alt={project.title}
             className="w-full h-full object-cover"
           />
