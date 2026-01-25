@@ -59,8 +59,8 @@ export interface Category {
   label: string
   description: string | null
   order: number
-  created_at: string
-  updated_at: string
+  createdAt: string
+  updatedAt: string
 }
 
 export interface CategoryWithCount extends Category {
@@ -95,7 +95,7 @@ export interface Project {
   tags: string[]
   category: Category
   year: string
-  cover_image?: string | null
+  coverImage?: string | null
   link?: string | null
   github?: string | null
   metrics?: string | null
@@ -103,8 +103,8 @@ export interface Project {
   featured: boolean
   order: number
   published?: boolean
-  created_at: string
-  updated_at: string
+  createdAt: string
+  updatedAt: string
 }
 
 export interface ProjectCategory {

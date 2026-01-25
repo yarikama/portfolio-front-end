@@ -7,9 +7,9 @@ export interface CreateProjectData {
   title: string
   description: string
   tags: string[]
-  category_id: string
+  categoryId: string
   year: string
-  cover_image?: string
+  coverImage?: string
   link?: string
   github?: string
   metrics?: string
