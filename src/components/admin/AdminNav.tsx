@@ -3,6 +3,13 @@ import { useAuth } from '../../hooks/useAuth'
 import { FileText, FolderKanban, Tags, LogOut } from 'lucide-react'
 import ThemeToggle from '../ui/ThemeToggle'
 
+// Operations dashboards for the home cluster. Both sit behind Cloudflare
+// Access, so a visitor who finds these links only reaches a login page.
+const OPS_LINKS = [
+  { label: 'Grafana', href: 'https://grafana.yarikama.com' },
+  { label: 'Argo CD', href: 'https://argocd.yarikama.com' },
+]
+
 export default function AdminNav() {
   const location = useLocation()
   const navigate = useNavigate()
@@ -85,6 +92,18 @@ export default function AdminNav() {
 
           {/* Actions */}
           <div className="flex items-center gap-4">
+            {OPS_LINKS.map(({ label, href }) => (
+              <a
+                key={href}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-xs uppercase tracking-widest text-zinc-400 hover:text-ink dark:hover:text-white transition-colors"
+              >
+                {label}
+              </a>
+            ))}
+            <span className="text-zinc-300 dark:text-zinc-600">|</span>
             <a
               href="/"
               target="_blank"
