@@ -4,3 +4,4 @@ export { useProjects, useFeaturedProjects, useProject, useProjectCategories } fr
 export { useContactForm } from './useContact'
 export { useAuth } from './useAuth'
 export { useAutocomplete } from './useAutocomplete'
+export { useNoteDraft } from './useNoteDraft'

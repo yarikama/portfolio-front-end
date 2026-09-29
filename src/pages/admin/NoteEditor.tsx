@@ -1,10 +1,10 @@
 import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { adminLabNotesService, uploadService, type CreateLabNoteData } from '../../services/api'
-import { ArrowLeft, Save, Loader2, Eye, Columns, Square, ImagePlus, Sparkles } from 'lucide-react'
+import { ArrowLeft, Save, Loader2, Eye, Columns, Square, ImagePlus, Sparkles, History } from 'lucide-react'
 import AdminNav from '../../components/admin/AdminNav'
 import MarkdownRenderer from '../../components/ui/MarkdownRenderer'
-import { useAutocomplete } from '../../hooks'
+import { useAutocomplete, useNoteDraft } from '../../hooks'
 
 function generateSlug(title: string): string {
   return title
@@ -13,6 +13,10 @@ function generateSlug(title: string): string {
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
     .trim()
+}
+
+function formatTime(iso: string): string {
+  return new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
 }
 
 function estimateReadTime(content: string): string {
@@ -48,6 +52,17 @@ export default function NoteEditor() {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const ghostRef = useRef<HTMLDivElement>(null)
   const [scrollbarWidth, setScrollbarWidth] = useState(0)
+
+  const draft = useNoteDraft({
+    noteId: id,
+    data: { formData, tagsInput },
+    ready: !isLoadingNote,
+    onRestore: (saved) => {
+      setFormData(saved.formData)
+      setTagsInput(saved.tagsInput)
+      setAutoSlug(false)
+    },
+  })
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Load existing note for editing - always fetch from API to get full content
@@ -220,6 +235,9 @@ export default function NoteEditor() {
     e.preventDefault()
     setError(null)
     setIsSaving(true)
+    // If the request fails (an expired session redirects to the login page),
+    // the latest text is already in the draft.
+    draft.flush()
 
     try {
       if (isEditing && id) {
@@ -227,6 +245,7 @@ export default function NoteEditor() {
       } else {
         await adminLabNotesService.create(formData)
       }
+      draft.markSaved()
       navigate('/admin/notes')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save note')
@@ -262,6 +281,14 @@ export default function NoteEditor() {
             </h1>
           </div>
           <div className="flex items-center gap-3">
+            {draft.savedAt && (
+              <span
+                className="font-mono text-[0.8rem] text-zinc-400"
+                title="Unsaved changes are kept in this browser until you save"
+              >
+                Draft kept · {new Date(draft.savedAt).toLocaleTimeString(undefined, { timeStyle: 'short' })}
+              </span>
+            )}
             {isEditing && formData.slug && (
               <Link
                 to={`/notes/${formData.slug}`}
@@ -297,6 +324,31 @@ export default function NoteEditor() {
 
       {/* Form */}
       <main className="max-w-6xl mx-auto px-6 py-8">
+        {draft.offer && (
+          <div className="mb-6 p-4 border border-sage/40 bg-sage/5 flex flex-wrap items-center justify-between gap-3">
+            <p className="flex items-center gap-2 text-sm text-ink dark:text-zinc-200">
+              <History size={16} className="text-sage" />
+              Unsaved changes from {formatTime(draft.offer.savedAt)} were kept in this browser.
+            </p>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={draft.restore}
+                className="px-3 py-1.5 bg-ink text-paper dark:bg-white dark:text-zinc-900 font-mono text-xs uppercase tracking-widest hover:opacity-90"
+              >
+                Restore
+              </button>
+              <button
+                type="button"
+                onClick={draft.discard}
+                className="px-3 py-1.5 border border-zinc-300 dark:border-zinc-600 font-mono text-xs uppercase tracking-widest text-zinc-500 hover:text-ink dark:hover:text-white"
+              >
+                Discard
+              </button>
+            </div>
+          </div>
+        )}
+
         {error && (
           <div className="mb-6 p-4 border border-red-300 bg-red-50 dark:bg-red-900/20 dark:border-red-800">
             <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
