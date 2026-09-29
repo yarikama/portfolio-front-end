@@ -1,4 +1,5 @@
-import { useEffect, useState, useRef, ReactNode } from 'react'
+import { useEffect, useState, ReactNode } from 'react'
+import { usePrefersReducedMotion } from '../../hooks'
 
 interface StreamingTextProps {
   children: string
@@ -74,6 +75,15 @@ export function StreamingRichText({
   const [hasStarted, setHasStarted] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
   const totalLength = segments.reduce((acc, seg) => acc + seg.text.length, 0)
+  const reduceMotion = usePrefersReducedMotion()
+
+  // Skip the typing effect entirely when the user prefers reduced motion
+  useEffect(() => {
+    if (reduceMotion && trigger && !isComplete) {
+      setCurrentIndex(totalLength)
+      setHasStarted(true)
+    }
+  }, [reduceMotion, trigger, isComplete, totalLength])
 
   useEffect(() => {
     if (!trigger) {

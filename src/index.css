@@ -42,6 +42,33 @@
 /* Base Styles */
 html {
   scroll-behavior: smooth;
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+/* Keyboard focus ring for every interactive element */
+:focus-visible {
+  outline: 2px solid var(--color-sage);
+  outline-offset: 3px;
+}
+
+/* Reduced motion: stop CSS animations, transitions and smooth scrolling site-wide.
+   JS-driven motion (typing, scroll-linked cards, parallax) checks the same query. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 body {
@@ -86,12 +113,6 @@ body.dark {
   color: var(--color-paper);
 }
 
-/* Hide default cursor */
-.cursor-none,
-.cursor-none * {
-  cursor: none !important;
-}
-
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
@@ -133,79 +154,6 @@ body.dark {
 
 .font-mono {
   font-family: var(--font-mono);
-}
-
-/* Magazine Line Animation */
-@keyframes line-expand {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
-
-.magazine-line {
-  height: 0.5px;
-  background-color: var(--color-zinc-300);
-  transform-origin: left center;
-  animation: line-expand var(--transition-slow) forwards;
-}
-
-.dark .magazine-line {
-  background-color: rgba(212, 212, 216, 0.3);
-}
-
-/* Scroll Reveal Animation */
-@keyframes fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.reveal {
-  opacity: 0;
-}
-
-.reveal.visible {
-  animation: fade-up var(--transition-slow) forwards;
-}
-
-/* Stagger delay utilities */
-.delay-100 { animation-delay: 100ms; }
-.delay-200 { animation-delay: 200ms; }
-.delay-300 { animation-delay: 300ms; }
-.delay-400 { animation-delay: 400ms; }
-.delay-500 { animation-delay: 500ms; }
-
-/* Hover italic transition for headings */
-.hover-italic {
-  transition: font-style var(--transition-fast);
-}
-
-.hover-italic:hover {
-  font-style: italic;
-}
-
-/* Drop Cap */
-.drop-cap::first-letter {
-  float: left;
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 2.5em;
-  line-height: 0.85;
-  padding-right: 0.08em;
-  margin-top: 0.05em;
-  color: var(--color-ink);
-}
-
-.dark .drop-cap::first-letter {
-  color: #e8e8e8;
 }
 
 /* Data Stream - vertical text */
@@ -294,60 +242,6 @@ body.dark {
   height: auto;
   transition: transform 0.3s ease-out;
   will-change: transform;
-}
-
-/* Reduced motion preference */
-@media (prefers-reduced-motion: reduce) {
-  .hero-photo-bg,
-  .hero-photo-bg-blur,
-  .hero-photo-fg {
-    transition: none;
-  }
-}
-
-/* Chinese Rain Animation */
-@keyframes rain-fall {
-  0% {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(100vh);
-    opacity: 0;
-  }
-}
-
-.animate-rain {
-  animation: rain-fall linear infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-rain {
-    animation: none;
-    opacity: 0.03;
-    transform: translateY(20%);
-  }
-}
-
-/* Scroll indicator bar animation */
-@keyframes scroll-bar {
-  0%, 100% {
-    height: 8px;
-  }
-  50% {
-    height: 20px;
-  }
-}
-
-.animate-scroll-bar {
-  height: 8px;
-  animation: scroll-bar 1.5s ease-in-out infinite;
 }
 
 /* Card nudge animation to hint it's flippable */

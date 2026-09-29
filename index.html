@@ -5,7 +5,46 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.png" />
     <link rel="alternate icon" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Henry's Portfolio - A portfolio of crafted code and considered design" />
+    <meta name="theme-color" content="#f8f7f4" />
+
+    <!-- Apply the saved or system theme before first paint, so dark mode never flashes light.
+         src/lib/theme.ts takes over once React loads. -->
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem('theme')
+          var dark = saved
+            ? saved === 'dark'
+            : window.matchMedia('(prefers-color-scheme: dark)').matches
+          document.documentElement.classList.toggle('dark', dark)
+          document
+            .querySelector('meta[name="theme-color"]')
+            .setAttribute('content', dark ? '#0f0f0f' : '#f8f7f4')
+        } catch (e) {}
+      })()
+    </script>
+
+    <title>Henry Hsu | Software Engineer, GenAI &amp; Infrastructure</title>
+    <meta
+      name="description"
+      content="Henry Hsu builds GenAI systems and the infrastructure behind them. Former Google SWE intern and MaiAgent GenAI team lead, now completing an M.C.S. at Rice University."
+    />
+    <link rel="canonical" href="https://www.yarikama.com/" />
+
+    <!-- Link previews (LinkedIn, Slack, X, iMessage) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Henry Hsu" />
+    <meta property="og:url" content="https://www.yarikama.com/" />
+    <meta property="og:title" content="Henry Hsu | Software Engineer, GenAI & Infrastructure" />
+    <meta
+      property="og:description"
+      content="Building GenAI systems and the infrastructure behind them. Former Google SWE intern, MaiAgent GenAI team lead, Rice M.C.S."
+    />
+    <meta property="og:image" content="https://www.yarikama.com/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Henry Hsu, Software Engineer across GenAI and infrastructure" />
+    <meta name="twitter:card" content="summary_large_image" />
 
     <!-- Fonts: Cormorant Garamond (humanist), Inter (body), JetBrains Mono (technical), Noto Serif TC (Chinese) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -14,8 +53,6 @@
       href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;500;600&display=swap"
       rel="stylesheet"
     />
-
-    <title>Henry's Portfolio</title>
   </head>
   <body>
     <div id="root"></div>

@@ -1,29 +1,50 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef } from 'react'
+import { useFinePointer, usePrefersReducedMotion } from '../../hooks'
+
+// Parallax offset for one decor piece, read from --mx / --my on the container
+const drift = (x: number, y: number) => ({
+  transform: `translate(calc(var(--mx) * ${x}px), calc(var(--my) * ${y}px))`,
+  transition: 'transform 0.3s ease-out',
+})
 
 export default function GeometricDecor() {
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
+  const containerRef = useRef<HTMLDivElement>(null)
+  const parallaxEnabled = useFinePointer() && !usePrefersReducedMotion()
 
+  // Write the mouse offset to CSS variables so movement never re-renders
   useEffect(() => {
+    if (!parallaxEnabled) return
+    let frame = 0
+    let x = 0
+    let y = 0
+    const update = () => {
+      frame = 0
+      containerRef.current?.style.setProperty('--mx', String(x))
+      containerRef.current?.style.setProperty('--my', String(y))
+    }
     const handleMouseMove = (e: MouseEvent) => {
-      setMousePos({
-        x: (e.clientX / window.innerWidth - 0.5) * 20,
-        y: (e.clientY / window.innerHeight - 0.5) * 20,
-      })
+      x = (e.clientX / window.innerWidth - 0.5) * 20
+      y = (e.clientY / window.innerHeight - 0.5) * 20
+      if (!frame) frame = requestAnimationFrame(update)
     }
 
-    window.addEventListener('mousemove', handleMouseMove)
-    return () => window.removeEventListener('mousemove', handleMouseMove)
-  }, [])
+    window.addEventListener('mousemove', handleMouseMove, { passive: true })
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      cancelAnimationFrame(frame)
+    }
+  }, [parallaxEnabled])
 
   return (
-    <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+    <div
+      ref={containerRef}
+      className="absolute inset-0 pointer-events-none z-0 overflow-hidden [--mx:0] [--my:0]"
+      aria-hidden="true"
+    >
       {/* 左上：尺寸標註線 */}
       <svg
         className="absolute top-[10%] left-[4%] w-40 h-24"
-        style={{
-          transform: `translate(${mousePos.x * 0.4}px, ${mousePos.y * 0.4}px)`,
-          transition: 'transform 0.3s ease-out',
-        }}
+        style={drift(0.4, 0.4)}
         viewBox="0 0 120 70"
         fill="none"
       >
@@ -44,10 +65,7 @@ export default function GeometricDecor() {
       {/* 右上：直角標記 + 延伸線 */}
       <svg
         className="absolute top-[8%] right-[6%] w-32 h-32"
-        style={{
-          transform: `translate(${mousePos.x * -0.35}px, ${mousePos.y * 0.35}px)`,
-          transition: 'transform 0.3s ease-out',
-        }}
+        style={drift(-0.35, 0.35)}
         viewBox="0 0 80 80"
         fill="none"
       >
@@ -64,10 +82,7 @@ export default function GeometricDecor() {
       {/* 左側：垂直刻度尺 */}
       <svg
         className="absolute top-[35%] left-[2%] w-12 h-48"
-        style={{
-          transform: `translate(${mousePos.x * 0.5}px, ${mousePos.y * 0.3}px)`,
-          transition: 'transform 0.3s ease-out',
-        }}
+        style={drift(0.5, 0.3)}
         viewBox="0 0 30 120"
         fill="none"
       >
@@ -91,10 +106,7 @@ export default function GeometricDecor() {
       {/* 右側：傾斜標註 */}
       <svg
         className="absolute top-[45%] right-[3%] w-28 h-36"
-        style={{
-          transform: `translate(${mousePos.x * -0.3}px, ${mousePos.y * 0.25}px)`,
-          transition: 'transform 0.3s ease-out',
-        }}
+        style={drift(-0.3, 0.25)}
         viewBox="0 0 70 90"
         fill="none"
       >
@@ -111,10 +123,7 @@ export default function GeometricDecor() {
       {/* 左下：座標基準點 */}
       <svg
         className="absolute bottom-[12%] left-[6%] w-24 h-24"
-        style={{
-          transform: `translate(${mousePos.x * 0.35}px, ${mousePos.y * -0.35}px)`,
-          transition: 'transform 0.3s ease-out',
-        }}
+        style={drift(0.35, -0.35)}
         viewBox="0 0 60 60"
         fill="none"
       >
@@ -131,10 +140,7 @@ export default function GeometricDecor() {
       {/* 右下：尺寸箭頭標註 */}
       <svg
         className="absolute bottom-[18%] right-[10%] w-36 h-16"
-        style={{
-          transform: `translate(${mousePos.x * -0.25}px, ${mousePos.y * -0.25}px)`,
-          transition: 'transform 0.3s ease-out',
-        }}
+        style={drift(-0.25, -0.25)}
         viewBox="0 0 100 40"
         fill="none"
       >
@@ -152,10 +158,7 @@ export default function GeometricDecor() {
       {/* 底部：水平基準線 */}
       <div
         className="absolute bottom-[8%] left-[20%] w-[25%] h-px bg-gradient-to-r from-zinc-300 via-sage to-zinc-300 opacity-20"
-        style={{
-          transform: `translateY(${mousePos.y * -0.15}px)`,
-          transition: 'transform 0.3s ease-out',
-        }}
+        style={drift(0, -0.15)}
       />
     </div>
   )

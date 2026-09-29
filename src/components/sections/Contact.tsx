@@ -138,7 +138,7 @@ export default function Contact() {
                   className={`
                     w-full px-4 py-3 bg-transparent border
                     font-serif text-lg
-                    focus:outline-none focus:border-ink dark:focus:border-zinc-400
+                    focus:border-ink dark:focus:border-zinc-400
                     transition-colors duration-300
                     ${fieldErrors.name ? 'border-red-400' : 'border-zinc-200 dark:border-zinc-700'}
                   `}
@@ -166,7 +166,7 @@ export default function Contact() {
                   className={`
                     w-full px-4 py-3 bg-transparent border
                     font-serif text-lg
-                    focus:outline-none focus:border-ink dark:focus:border-zinc-400
+                    focus:border-ink dark:focus:border-zinc-400
                     transition-colors duration-300
                     ${fieldErrors.email ? 'border-red-400' : 'border-zinc-200 dark:border-zinc-700'}
                   `}
@@ -197,7 +197,7 @@ export default function Contact() {
                 className={`
                   w-full px-4 py-3 bg-transparent border
                   font-serif text-lg
-                  focus:outline-none focus:border-ink dark:focus:border-zinc-400
+                  focus:border-ink dark:focus:border-zinc-400
                   transition-colors duration-300
                   ${fieldErrors.subject ? 'border-red-400' : 'border-zinc-200 dark:border-zinc-700'}
                 `}
@@ -227,7 +227,7 @@ export default function Contact() {
                 className={`
                   w-full px-4 py-3 bg-transparent border resize-none
                   font-serif text-lg leading-relaxed
-                  focus:outline-none focus:border-ink dark:focus:border-zinc-400
+                  focus:border-ink dark:focus:border-zinc-400
                   transition-colors duration-300
                   ${fieldErrors.message ? 'border-red-400' : 'border-zinc-200 dark:border-zinc-700'}
                 `}
@@ -246,7 +246,7 @@ export default function Contact() {
                 font-mono text-sm uppercase tracking-widest
                 hover:bg-ink hover:text-paper dark:hover:bg-zinc-400 dark:hover:text-zinc-900
                 disabled:opacity-50 disabled:cursor-not-allowed
-                transition-all duration-300
+                transition-colors duration-300
                 flex items-center justify-center gap-2
               "
             >
@@ -278,10 +278,10 @@ export default function Contact() {
               href={link.href}
               target="_blank"
               rel="noopener noreferrer"
-              download={link.href.endsWith('.pdf') ? true : undefined}
+              download={link.href.endsWith('.pdf') ? 'Henry_Hsu_Resume.pdf' : undefined}
               className="
                 group p-6 border border-zinc-200 dark:border-zinc-700 hover:border-zinc-400
-                transition-all duration-300
+                transition-colors duration-300
               "
             >
               <div className="flex items-start justify-between">
@@ -289,7 +289,7 @@ export default function Contact() {
                   <p className="font-mono text-sm text-zinc-400 uppercase tracking-widest mb-2">
                     {link.label}
                   </p>
-                  <p className="font-serif text-lg transition-all duration-300">
+                  <p className="font-serif text-lg transition-colors duration-300">
                     {link.value}
                   </p>
                 </div>

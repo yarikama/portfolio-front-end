@@ -51,7 +51,7 @@ export default function BriefSelection() {
             inline-block font-mono text-xs uppercase tracking-widest
             text-zinc-faded hover:text-ink
             border-b border-zinc-300 hover:border-ink
-            pb-1 transition-all duration-300
+            pb-1 transition-colors duration-300
           "
         >
           View Full Archive

@@ -3,7 +3,7 @@ import type { TechCategory, LabNote } from '../types'
 export const techStack: TechCategory[] = [
   {
     category: 'Languages',
-    items: ['Python', 'C/C++', 'TypeScript', 'JavaScript'],
+    items: ['Python', 'Java', 'C/C++', 'TypeScript', 'JavaScript'],
   },
   {
     category: 'GenAI',
@@ -16,6 +16,10 @@ export const techStack: TechCategory[] = [
   {
     category: 'Backend',
     items: ['Django', 'FastAPI', 'Express.js', 'Nginx'],
+  },
+  {
+    category: 'APIs & Async',
+    items: ['RESTful', 'WebSocket', 'Redis Pub/Sub', 'asyncio', 'Celery'],
   },
   {
     category: 'Frontend',
@@ -31,11 +35,15 @@ export const techStack: TechCategory[] = [
   },
   {
     category: 'Tools',
-    items: ['nvim', 'git', 'Docker', 'Shell Script', 'pytest'],
+    items: ['nvim', 'git', 'Docker', 'GitHub Actions', 'Shell Script'],
+  },
+  {
+    category: 'Testing',
+    items: ['pytest', 'JUnit', 'Vitest'],
   },
   {
     category: 'Practices',
-    items: ['Agile', 'Scrum', 'TDD', 'CI/CD', 'Code Review'],
+    items: ['TDD', 'CI/CD', 'Code Review'],
   },
 ]
 

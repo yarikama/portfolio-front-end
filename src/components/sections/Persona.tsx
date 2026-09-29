@@ -4,28 +4,23 @@ import TechTable from '../ui/TechTable'
 import MagazineLine from '../ui/MagazineLine'
 import { techStack } from '../../data/techStack'
 import { StreamingRichText } from '../ui/StreamingText'
+import { usePrefersReducedMotion } from '../../hooks'
 
 // Define the text segments for streaming
 const paragraph1 = [
-  { text: 't MaiAgent, I led a GenAI team that transformed chatbots into intelligent agents—growing users from ' },
-  { text: '3K to 20K (567%)', highlight: true },
+  { text: 't MaiAgent, I led the GenAI team that turned chatbots into AI agents—growing users from ' },
+  { text: '3K to 20K', highlight: true },
   { text: ' and partners by ' },
   { text: '120%', highlight: true },
-  { text: ' (CTBC Bank, MSI, HPE). We scaled our RAG system from ' },
-  { text: '3M to 20M+', highlight: true },
-  { text: ' text chunks while cutting LLM token costs by ' },
-  { text: '67%', highlight: true },
-  { text: '.' },
+  { text: ' (CTBC Bank, MSI, HPE, iGroup). Then at ' },
+  { text: 'Google', highlight: true },
+  { text: ', I built the other half: integration test infrastructure from a zero baseline, and an LLM agent that triages and reproduces device failures.' },
 ]
 
 const paragraph2 = [
-  { text: 'I believe production AI is about more than models. It\'s async pipelines handling ' },
-  { text: '10M+ records', highlight: true },
-  { text: ', WebSocket systems pushing real-time updates, and ' },
-  { text: '140+ optimized APIs', highlight: true },
-  { text: ' running ' },
-  { text: '27.7% faster', highlight: true },
-  { text: '. I contributed ' },
+  { text: 'I believe production AI is about more than models. It\'s async pipelines scaling from ' },
+  { text: '3M to 20M+', highlight: true },
+  { text: ' text chunks, WebSocket systems pushing real-time updates, and tests that catch regressions before users do. I contributed ' },
   { text: '14 PRs', highlight: true },
   { text: ' to LlamaIndex (15K+ stars), working on integrations with AWS Bedrock, Claude, Elasticsearch, and MCP.' },
 ]
@@ -35,7 +30,22 @@ const paragraph3 = [
   { text: 'Rice University', highlight: true },
   { text: ' (M.C.S., GPA ' },
   { text: '4.0', highlight: true },
-  { text: '), I\'m deepening foundations in database implementation and distributed systems.' },
+  { text: '), I\'ve built a relational database engine from scratch in C++ and distilled LLaVA\'s attention into a ' },
+  { text: '1.3M-parameter', highlight: true },
+  { text: ' image token pruner.' },
+]
+
+const honors = [
+  {
+    title: 'Atona Case Competition Finalist',
+    detail: 'National enterprise transformation competition',
+    rank: 'Top 1%',
+  },
+  {
+    title: 'AI Workshop Outstanding Award',
+    detail: 'Multi-Agent RAG tutoring system, NYCU CS',
+    rank: 'Top 3/50',
+  },
 ]
 
 export default function Persona() {
@@ -47,6 +57,7 @@ export default function Persona() {
   const [p2Done, setP2Done] = useState(false)
   const sectionRef = useRef<HTMLDivElement>(null)
   const animationRef = useRef<number | null>(null)
+  const reduceMotion = usePrefersReducedMotion()
 
   // Intersection Observer for triggering streaming
   useEffect(() => {
@@ -67,8 +78,10 @@ export default function Persona() {
   }, [isInView])
 
   useEffect(() => {
-    if (isHovered) {
-      let start = 0
+    if (isHovered && reduceMotion) {
+      // Jump straight to the final count instead of animating it
+      setPrCount(14)
+    } else if (isHovered) {
       const duration = 800
       const startTime = performance.now()
 
@@ -96,7 +109,7 @@ export default function Persona() {
         cancelAnimationFrame(animationRef.current)
       }
     }
-  }, [isHovered])
+  }, [isHovered, reduceMotion])
   return (
     <Section id="about">
       <div ref={sectionRef} className="grid md:grid-cols-2 gap-16 md:gap-24">
@@ -112,9 +125,11 @@ export default function Persona() {
 
           <MagazineLine className="my-8" />
 
+          {/* Each paragraph stacks a transparent full copy (reserves space, read by
+              screen readers) under the typed-out copy (hidden from screen readers) */}
           <div className="space-y-6 text-zinc-faded font-serif text-lg md:text-xl leading-relaxed">
             <div className="grid">
-              <p className="col-start-1 row-start-1 invisible">
+              <p className="col-start-1 row-start-1 opacity-0">
                 <span className="float-left font-serif text-6xl leading-none mr-3 mt-1 text-ink">
                   A
                 </span>
@@ -124,7 +139,7 @@ export default function Persona() {
                   </span>
                 ))}
               </p>
-              <p className="col-start-1 row-start-1">
+              <p className="col-start-1 row-start-1" aria-hidden="true">
                 <span className="float-left font-serif text-6xl leading-none mr-3 mt-1 text-ink">
                   A
                 </span>
@@ -139,14 +154,14 @@ export default function Persona() {
             </div>
 
             <div className="grid">
-              <p className="col-start-1 row-start-1 invisible">
+              <p className="col-start-1 row-start-1 opacity-0">
                 {paragraph2.map((seg, i) => (
                   <span key={i} className={seg.highlight ? 'text-sage font-semibold' : ''}>
                     {seg.text}
                   </span>
                 ))}
               </p>
-              <p className="col-start-1 row-start-1">
+              <p className="col-start-1 row-start-1" aria-hidden="true">
                 <StreamingRichText
                   segments={paragraph2}
                   trigger={p1Done}
@@ -158,14 +173,14 @@ export default function Persona() {
             </div>
 
             <div className="grid">
-              <p className="col-start-1 row-start-1 invisible">
+              <p className="col-start-1 row-start-1 opacity-0">
                 {paragraph3.map((seg, i) => (
                   <span key={i} className={seg.highlight ? 'text-sage font-semibold' : ''}>
                     {seg.text}
                   </span>
                 ))}
               </p>
-              <p className="col-start-1 row-start-1">
+              <p className="col-start-1 row-start-1" aria-hidden="true">
                 <StreamingRichText
                   segments={paragraph3}
                   trigger={p2Done}
@@ -191,7 +206,7 @@ export default function Persona() {
                     <span className="font-mono text-xs text-sage border border-sage/40 px-1.5 py-0.5">GPA 4.0</span>
                   </div>
                   <p className="text-sm text-zinc-faded">
-                    M.C.S., Computer Science — 2025-2026
+                    M.C.S., Computer Science — 2025-2026 (Expected Dec.)
                   </p>
                   <p className="text-xs text-zinc-400 mt-1">
                     Database Implementation, Web Development, Big Data & ML
@@ -209,11 +224,30 @@ export default function Persona() {
                     B.S., Industrial Engineering + CS Minor — 2020-2024
                   </p>
                   <p className="text-xs text-zinc-400 mt-1">
-                    AI Capstone, Operating System, System Administration
+                    CS Minor GPA 4.13 · AI Capstone, Operating System, System Administration
                   </p>
                 </div>
               </div>
             </div>
+          </div>
+
+          <div className="mt-8 space-y-4">
+            <p className="font-mono text-sm text-zinc-400 uppercase tracking-widest">
+              Honors
+            </p>
+            <ul className="space-y-3">
+              {honors.map((honor) => (
+                <li key={honor.title} className="flex items-baseline justify-between gap-4">
+                  <div>
+                    <p className="text-ink font-medium">{honor.title}</p>
+                    <p className="text-xs text-zinc-400 mt-1">{honor.detail}</p>
+                  </div>
+                  <span className="font-mono text-xs text-sage border border-sage/40 px-1.5 py-0.5 whitespace-nowrap">
+                    {honor.rank}
+                  </span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
@@ -230,10 +264,22 @@ export default function Persona() {
           <TechTable data={techStack} />
 
           <div
+            role="button"
+            tabIndex={0}
+            aria-pressed={isFocusFlipped}
+            aria-describedby="previous-focus"
             className="mt-12 h-36 cursor-pointer"
             style={{ perspective: '1000px' }}
-            onMouseEnter={() => setIsFocusFlipped(true)}
-            onMouseLeave={() => setIsFocusFlipped(false)}
+            // Hover flips for mouse users only; touch and keyboard users toggle
+            onPointerEnter={(e) => e.pointerType === 'mouse' && setIsFocusFlipped(true)}
+            onPointerLeave={(e) => e.pointerType === 'mouse' && setIsFocusFlipped(false)}
+            onClick={() => setIsFocusFlipped((flipped) => !flipped)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                setIsFocusFlipped((flipped) => !flipped)
+              }
+            }}
           >
             <div
               className="relative w-full h-full transition-transform duration-700"
@@ -251,12 +297,13 @@ export default function Persona() {
                   Current Focus
                 </p>
                 <p className="text-sm text-zinc-faded leading-relaxed">
-                  <span className="text-sage font-medium">Machine Learning</span> for production systems, <span className="text-sage font-medium">Deep Learning</span> architectures for sequence modeling, and <span className="text-sage font-medium">NLP</span> pipelines powering intelligent document understanding and conversational AI.
+                  <span className="text-sage font-medium">Agentic Developer Tooling</span> for failure triage, <span className="text-sage font-medium">Efficient Multimodal Inference</span> via token pruning, and <span className="text-sage font-medium">Database Internals</span> from storage to query optimization.
                 </p>
               </div>
 
-              {/* Back - Previous */}
+              {/* Back - Previous (read out through aria-describedby) */}
               <div
+                aria-hidden="true"
                 className="absolute inset-0 p-6 bg-sage text-paper"
                 style={{
                   backfaceVisibility: 'hidden',
@@ -266,7 +313,7 @@ export default function Persona() {
                 <p className="font-mono text-xs text-paper/70 uppercase tracking-widest mb-3">
                   Previous Focus
                 </p>
-                <p className="text-sm leading-relaxed">
+                <p id="previous-focus" className="text-sm leading-relaxed">
                   Building <span className="font-semibold">Production-Ready Generative AI</span> and <span className="font-semibold">RAG Systems</span>, alongside <span className="font-semibold">Data-Intensive Backend Systems</span> that scale.
                 </p>
               </div>
