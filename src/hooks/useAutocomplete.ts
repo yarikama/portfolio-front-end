@@ -140,9 +140,9 @@ export function useAutocomplete({ textareaRef, content, title, noteId, insert }:
       .complete({ prefix, title: context.current.title, noteId: context.current.noteId }, controller.signal)
       .then(({ id, suggestion }) => {
         if (controller.signal.aborted || !id || !suggestion) return
-        // Too late: the author has moved on since asking.
+        // Too late: the author has moved on since asking. It was never
+        // shown, so it is not reported either, and leaves no record.
         if (textarea.value !== text || textarea.selectionStart !== caret || shownRef.current) {
-          adminAutocompleteService.feedback(id, 'ignored')
           return
         }
         show({ id, text: suggestion, start: caret, before: prefix, typed: 0 })
