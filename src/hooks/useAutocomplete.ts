@@ -5,6 +5,8 @@ import { adminAutocompleteService, type SuggestionOutcome } from '../services/ap
 // The model and the network take about 0.25 s on top of this.
 const DEBOUNCE_MS = 150
 const STORAGE_KEY = 'admin.autocomplete.enabled'
+// How long a warmed-up connection is trusted before focusing warms it again.
+const WARM_UP_EVERY_MS = 30_000
 
 const NAVIGATION_KEYS = new Set([
   'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Home', 'End', 'PageUp', 'PageDown',
@@ -93,6 +95,7 @@ export function useAutocomplete({ textareaRef, content, title, noteId, insert }:
   // The content an accepted word will produce, so that edit is not mistaken
   // for the author typing something else.
   const acceptedWordEdit = useRef<string | null>(null)
+  const lastWarmUp = useRef(0)
   // Latest title and note id for the debounced request, without re-running
   // the content effect when they change.
   const context = useRef({ title, noteId })
@@ -236,6 +239,19 @@ export function useAutocomplete({ textareaRef, content, title, noteId, insert }:
     }
   }
 
+  // Entering the editor sends an empty request, answered without the model.
+  // It opens the connection (TCP and TLS, ~190 ms) and gets the CORS
+  // preflight answered (~100-220 ms) while the author is still reading, so
+  // the first real suggestion after a pause does not pay for either.
+  const onFocus = () => {
+    if (!enabled || Date.now() - lastWarmUp.current < WARM_UP_EVERY_MS) return
+    lastWarmUp.current = Date.now()
+    adminAutocompleteService.complete(
+      { prefix: '', title: '' },
+      new AbortController().signal,
+    )
+  }
+
   const onPointerDown = () => {
     cancelPending()
     resolve('ignored', shownRef.current?.typed)
@@ -268,6 +284,6 @@ export function useAutocomplete({ textareaRef, content, title, noteId, insert }:
     enabled,
     setEnabled,
     ghost,
-    handlers: { onKeyDown, onPointerDown, onBlur, onCompositionStart, onCompositionEnd },
+    handlers: { onKeyDown, onFocus, onPointerDown, onBlur, onCompositionStart, onCompositionEnd },
   }
 }
