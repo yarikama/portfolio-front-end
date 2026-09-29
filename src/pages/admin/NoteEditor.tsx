@@ -487,7 +487,7 @@ export default function NoteEditor() {
                 Content (Markdown)
                 <span className="ml-2 normal-case text-zinc-500">· {formData.readTime}</span>
                 {autocomplete.ghost && (
-                  <span className="ml-2 normal-case text-sage">· Tab to accept, Esc to dismiss</span>
+                  <span className="ml-2 normal-case text-sage">· Tab accepts all, ⌥→ one word, Esc dismisses</span>
                 )}
               </label>
               <div className="flex items-center gap-3">
