@@ -58,11 +58,7 @@ export default function ProjectCard({ project, index, featured = false }: Projec
             transform: 'translate(0, 0)',
           }}
         >
-          <img
-            src={project.coverImage}
-            alt={project.title}
-            className="w-full h-full object-cover"
-          />
+          <img src={project.coverImage} alt="" className="w-full h-full object-cover" />
         </div>
       )}
 
@@ -73,13 +69,22 @@ export default function ProjectCard({ project, index, featured = false }: Projec
             <h3
               className={`
                 font-serif font-light tracking-tight
-                transition-all duration-300
+                transition-colors duration-300
                 ${featured ? 'text-3xl md:text-4xl' : 'text-xl md:text-2xl'}
               `}
             >
-              <a href={project.link || '#'} className="hover:underline underline-offset-4">
-                {project.title}
-              </a>
+              {project.link ? (
+                <a
+                  href={project.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline underline-offset-4"
+                >
+                  {project.title}
+                </a>
+              ) : (
+                project.title
+              )}
             </h3>
           </div>
 
@@ -113,7 +118,7 @@ export default function ProjectCard({ project, index, featured = false }: Projec
             className="
               p-2 text-zinc-400 hover:text-ink
               transition-colors duration-300
-              opacity-0 group-hover:opacity-100
+              opacity-0 group-hover:opacity-100 focus-visible:opacity-100
             "
             aria-label={`View ${project.title}`}
           >

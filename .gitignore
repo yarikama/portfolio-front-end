@@ -14,5 +14,6 @@ dist
 .env.production.local
 
 # AI Instructions
-.claude
+.claude/settings.local.json
 .cursor
+.playwright-mcp

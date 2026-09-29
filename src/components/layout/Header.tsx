@@ -13,6 +13,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: 'About', href: '/#about', sectionId: 'about' },
+  { label: 'Experience', href: '/#experience', sectionId: 'experience' },
   { label: 'Works', href: '/#works', sectionId: 'works' },
   { label: 'Archive', href: '/archive', isRoute: true },
   { label: 'Notes', href: '/notes', isRoute: true },
@@ -25,6 +26,7 @@ const sectionIds = navItems
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
   const location = useLocation()
   const activeSection = useScrollSpy({ sectionIds })
 
@@ -39,25 +41,39 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Handle hash navigation after route change
+  // Close the mobile menu whenever the route or hash changes
+  useEffect(() => {
+    setIsMenuOpen(false)
+  }, [location])
+
+  // Close the mobile menu with Escape
+  useEffect(() => {
+    if (!isMenuOpen) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsMenuOpen(false)
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isMenuOpen])
+
+  // Handle hash navigation after route change. scrollIntoView without an
+  // explicit behavior follows the CSS scroll-behavior, which honors reduced motion.
   useEffect(() => {
     if (location.hash) {
       const element = document.querySelector(location.hash)
       if (element) {
         setTimeout(() => {
-          element.scrollIntoView({ behavior: 'smooth' })
+          element.scrollIntoView()
         }, 100)
       }
     }
   }, [location])
 
   const handleNavClick = (href: string, isRoute?: boolean) => {
+    setIsMenuOpen(false)
     if (!isRoute && href.startsWith('/#')) {
       if (location.pathname === '/') {
-        const element = document.querySelector(href.substring(1))
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' })
-        }
+        document.querySelector(href.substring(1))?.scrollIntoView()
       }
     }
   }
@@ -74,51 +90,44 @@ export default function Header() {
     return false
   }
 
+  const renderNavLink = (item: NavItem) => (
+    <Link
+      to={item.href}
+      onClick={() => handleNavClick(item.href, item.isRoute)}
+      aria-current={isActive(item) ? 'page' : undefined}
+      className={`
+        font-mono text-[0.8125rem] uppercase tracking-widest
+        transition-colors duration-300
+        ${isActive(item) ? 'text-sage' : 'text-zinc-faded hover:text-sage'}
+      `}
+    >
+      {item.label}
+    </Link>
+  )
+
   return (
     <header
       className={`
         fixed top-0 left-0 right-0 z-50
-        transition-all duration-500
-        ${isScrolled ? 'bg-paper/90 dark:bg-[#0f0f0f]/90 backdrop-blur-sm' : 'bg-transparent'}
+        transition-colors duration-500
+        ${
+          isMenuOpen
+            ? 'bg-paper dark:bg-[#0f0f0f] shadow-sm'
+            : isScrolled
+              ? 'bg-paper/90 dark:bg-[#0f0f0f]/90 backdrop-blur-sm'
+              : 'bg-transparent'
+        }
       `}
     >
       <Container>
         <nav className="flex items-center justify-between py-6">
-          <Link
-            to="/"
-            className="font-serif text-xl font-light tracking-tight transition-all duration-300"
-          >
+          <Link to="/" className="font-serif text-xl font-light tracking-tight">
             &lt;H,H&gt;
           </Link>
 
           <ul className="hidden md:flex items-center gap-8">
             {navItems.map((item) => (
-              <li key={item.href}>
-                {item.isRoute ? (
-                  <Link
-                    to={item.href}
-                    className={`
-                      font-mono text-[0.8125rem] uppercase tracking-widest
-                      transition-colors duration-300
-                      ${isActive(item) ? 'text-sage' : 'text-zinc-faded hover:text-sage'}
-                    `}
-                  >
-                    {item.label}
-                  </Link>
-                ) : (
-                  <Link
-                    to={item.href}
-                    onClick={() => handleNavClick(item.href, item.isRoute)}
-                    className={`
-                      font-mono text-[0.8125rem] uppercase tracking-widest
-                      transition-colors duration-300
-                      ${isActive(item) ? 'text-sage' : 'text-zinc-faded hover:text-sage'}
-                    `}
-                  >
-                    {item.label}
-                  </Link>
-                )}
-              </li>
+              <li key={item.href}>{renderNavLink(item)}</li>
             ))}
             <li>
               <ThemeToggle />
@@ -126,12 +135,28 @@ export default function Header() {
           </ul>
 
           <button
+            type="button"
+            onClick={() => setIsMenuOpen((open) => !open)}
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-menu"
             className="md:hidden font-mono text-[0.8125rem] uppercase tracking-widest"
-            aria-label="Menu"
           >
-            Menu
+            {isMenuOpen ? 'Close' : 'Menu'}
           </button>
         </nav>
+
+        {isMenuOpen && (
+          <div id="mobile-menu" className="md:hidden pb-6 border-t border-zinc-200 dark:border-zinc-200/20">
+            <ul className="flex flex-col gap-5 pt-6">
+              {navItems.map((item) => (
+                <li key={item.href}>{renderNavLink(item)}</li>
+              ))}
+            </ul>
+            <div className="mt-4 -ml-2">
+              <ThemeToggle />
+            </div>
+          </div>
+        )}
       </Container>
     </header>
   )

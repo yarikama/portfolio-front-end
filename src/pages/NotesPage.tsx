@@ -46,7 +46,7 @@ export default function NotesPage() {
                 onClick={() => setActiveTag(tagItem.tag === 'All' ? undefined : tagItem.tag)}
                 className={`
                   font-mono text-xs uppercase tracking-widest
-                  px-3 py-1.5 border transition-all duration-300
+                  px-3 py-1.5 border transition-colors duration-300
                   ${
                     (tagItem.tag === 'All' && !activeTag) || activeTag === tagItem.tag
                       ? 'border-ink text-ink bg-ink/5 dark:border-zinc-400 dark:bg-zinc-400/10'
@@ -108,7 +108,7 @@ export default function NotesPage() {
                     </span>
                   </div>
 
-                  <h2 className="font-serif text-2xl font-light tracking-tight transition-all duration-300 mb-3">
+                  <h2 className="font-serif text-2xl font-light tracking-tight transition-colors duration-300 mb-3">
                     {note.title}
                   </h2>
 

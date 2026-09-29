@@ -98,7 +98,7 @@ export default function NotePage() {
         <div className="text-center">
           <Link
             to="/notes"
-            className="inline-block font-mono text-xs uppercase tracking-widest text-zinc-faded hover:text-ink border-b border-zinc-300 hover:border-ink pb-1 transition-all duration-300"
+            className="inline-block font-mono text-xs uppercase tracking-widest text-zinc-faded hover:text-ink border-b border-zinc-300 hover:border-ink pb-1 transition-colors duration-300"
           >
             View All Notes
           </Link>

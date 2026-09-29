@@ -43,6 +43,26 @@ export interface TechCategory {
   items: string[]
 }
 
+export interface ExperienceHighlight {
+  label: string
+  // Wrap a figure in **double asterisks** to render it highlighted
+  text: string
+}
+
+export interface ExperienceRole {
+  title: string
+  period: string
+  highlights: ExperienceHighlight[]
+}
+
+export interface ExperienceEntry {
+  company: string
+  url: string
+  tagline?: string
+  location: string
+  roles: ExperienceRole[]
+}
+
 export interface NavItem {
   label: string
   href: string
