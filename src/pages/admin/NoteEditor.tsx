@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { adminLabNotesService, uploadService, type CreateLabNoteData } from '../../services/api'
-import { ArrowLeft, Save, Loader2, Eye, Columns, Square, ImagePlus } from 'lucide-react'
+import { ArrowLeft, Save, Loader2, Eye, Columns, Square, ImagePlus, Sparkles } from 'lucide-react'
 import AdminNav from '../../components/admin/AdminNav'
 import MarkdownRenderer from '../../components/ui/MarkdownRenderer'
+import { useAutocomplete } from '../../hooks'
 
 function generateSlug(title: string): string {
   return title
@@ -45,6 +46,8 @@ export default function NoteEditor() {
   const [showPreview, setShowPreview] = useState(true)
   const [isDragging, setIsDragging] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const ghostRef = useRef<HTMLDivElement>(null)
+  const [scrollbarWidth, setScrollbarWidth] = useState(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Load existing note for editing - always fetch from API to get full content
@@ -121,6 +124,26 @@ export default function NoteEditor() {
       textarea.selectionStart = textarea.selectionEnd = start + text.length
     }, 0)
   }
+
+  const autocomplete = useAutocomplete({
+    textareaRef,
+    content: formData.content,
+    title: formData.title,
+    noteId: id,
+    insert: insertAtCursor,
+  })
+
+  // Keep the ghost layer aligned with the textarea: same scroll position, and
+  // the same text width once the textarea shows a scrollbar.
+  useLayoutEffect(() => {
+    const textarea = textareaRef.current
+    const ghost = ghostRef.current
+    if (!textarea || !ghost) return
+    ghost.scrollTop = textarea.scrollTop
+    // offsetWidth - clientWidth is the scrollbar plus the 1px border on each side.
+    const width = Math.max(0, textarea.offsetWidth - textarea.clientWidth - 2)
+    if (width !== scrollbarWidth) setScrollbarWidth(width)
+  }, [autocomplete.ghost?.at, autocomplete.ghost?.text, scrollbarWidth])
 
   // Handle image upload
   const handleImageUpload = async (file: File) => {
@@ -411,8 +434,21 @@ export default function NoteEditor() {
               <label className="font-mono text-xs uppercase tracking-widest text-zinc-400">
                 Content (Markdown)
                 <span className="ml-2 normal-case text-zinc-500">· {formData.readTime}</span>
+                {autocomplete.ghost && (
+                  <span className="ml-2 normal-case text-sage">· Tab to accept, Esc to dismiss</span>
+                )}
               </label>
               <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => autocomplete.setEnabled(!autocomplete.enabled)}
+                  className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-zinc-400 hover:text-ink transition-colors"
+                  title="Inline suggestions from the note autocomplete model"
+                >
+                  <Sparkles size={14} className={autocomplete.enabled ? 'text-sage' : ''} />
+                  {autocomplete.enabled ? 'Autocomplete On' : 'Autocomplete Off'}
+                </button>
+                <span className="text-zinc-300 dark:text-zinc-600">|</span>
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
@@ -460,6 +496,10 @@ export default function NoteEditor() {
                   value={formData.content}
                   onChange={(e) => handleContentChange(e.target.value)}
                   onPaste={handlePaste}
+                  onScroll={(e) => {
+                    if (ghostRef.current) ghostRef.current.scrollTop = e.currentTarget.scrollTop
+                  }}
+                  {...autocomplete.handlers}
                   required
                   rows={25}
                   className={`
@@ -475,6 +515,19 @@ export default function NoteEditor() {
 
 Tip: Drag & drop or paste images directly here"
                 />
+                {autocomplete.ghost && (
+                  <div
+                    ref={ghostRef}
+                    aria-hidden="true"
+                    className="absolute inset-0 px-4 py-3 border border-transparent font-mono text-sm leading-relaxed whitespace-pre-wrap break-words overflow-hidden pointer-events-none"
+                    style={{ paddingRight: `calc(1rem + ${scrollbarWidth}px)` }}
+                  >
+                    {/* Invisible copy of the text before the caret, so the
+                        suggestion lands exactly where the caret is. */}
+                    <span className="invisible">{formData.content.slice(0, autocomplete.ghost.at)}</span>
+                    <span className="text-zinc-400 dark:text-zinc-500">{autocomplete.ghost.text}</span>
+                  </div>
+                )}
                 {isDragging && (
                   <div className="absolute inset-0 flex items-center justify-center bg-sage/10 border-2 border-dashed border-sage pointer-events-none">
                     <div className="flex flex-col items-center gap-2 text-sage">
