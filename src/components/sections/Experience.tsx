@@ -303,7 +303,9 @@ export default function Experience() {
           Where I've <span className="italic">Shipped</span>
         </h2>
         <p className="mt-4 text-zinc-faded max-w-2xl">
-          From AI agents serving enterprise clients to the test infrastructure that proves they work.
+          An Industrial Engineering background taught me to optimize whole workflows, not just
+          algorithms: from AI agents serving enterprise clients to the test infrastructure that
+          proves they work.
         </p>
         <MagazineLine className={useDrum ? 'mt-12' : 'my-12'} />
       </Container>
