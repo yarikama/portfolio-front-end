@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowUp, Loader2, Square } from 'lucide-react'
 import Section from '../layout/Section'
@@ -15,48 +15,14 @@ const SUGGESTIONS = [
   '他做過哪些 LLM 安全的研究？',
 ]
 
-const MARKER = /\[([PNR]\d+)\]/g
+// Markdown (with math) is loaded with the first answer, not with the page.
+const AnswerMarkdown = lazy(() => import('../ui/AnswerMarkdown'))
 
-/**
- * The answer text with its [P1]-style markers turned into numbered links to
- * the sources. While streaming the sources are not known yet, so markers
- * show muted; afterwards markers the API did not confirm are dropped.
- */
-function AnswerText({ turn }: { turn: Turn }) {
-  const numbers = new Map(turn.citations?.map((c, i) => [c.id, i + 1]))
-  const parts = turn.answer.split(MARKER)
+// Until it has loaded: the text alone, without the citation markers.
+function PlainAnswer({ turn }: { turn: Turn }) {
   return (
-    <p className="font-serif text-lg leading-relaxed whitespace-pre-wrap">
-      {parts.map((part, i) => {
-        // A marker sits right after its sentence, without the space the
-        // model tends to put before it.
-        if (i % 2 === 0) {
-          const text = i + 1 < parts.length ? part.replace(/[ \t]+$/, '') : part
-          return <Fragment key={i}>{text}</Fragment>
-        }
-        if (turn.status === 'streaming') {
-          return (
-            <sup key={i} className="font-mono text-[0.6em] text-zinc-400 ml-0.5">
-              ·
-            </sup>
-          )
-        }
-        const n = numbers.get(part)
-        if (!n) return null
-        return (
-          <sup key={i} className="ml-0.5">
-            <a
-              href={`#ask-source-${turn.id}-${n}`}
-              className="font-mono text-[0.6em] text-sage hover:underline"
-            >
-              [{n}]
-            </a>
-          </sup>
-        )
-      })}
-      {turn.status === 'streaming' && (
-        <span className="inline-block w-2 h-5 ml-0.5 align-text-bottom bg-sage animate-pulse" />
-      )}
+    <p className="text-[17px] leading-relaxed whitespace-pre-wrap">
+      {turn.answer.replace(/[ \t]*\[[PNR]\d+\]/g, '')}
     </p>
   )
 }
@@ -100,26 +66,35 @@ function TurnView({ turn }: { turn: Turn }) {
         {turn.question}
       </p>
 
-      {waiting && (
-        <p className="flex items-center gap-2 text-zinc-400 text-sm">
-          <Loader2 className="w-4 h-4 animate-spin" /> Thinking…
-        </p>
-      )}
-      {turn.answer && <AnswerText turn={turn} />}
-      {turn.status === 'error' && (
-        <p className="mt-2 text-sm text-red-600 dark:text-red-400">{turn.error}</p>
-      )}
+      {/* The answer, outlined: a line and no fill, facing the question */}
+      <div className="mr-auto w-fit max-w-[92%] rounded-2xl rounded-bl-md border border-zinc-300 dark:border-white/70 px-5 py-4">
+        {waiting && (
+          <p className="flex items-center gap-2 text-zinc-400 text-sm">
+            <Loader2 className="w-4 h-4 animate-spin" /> Thinking…
+          </p>
+        )}
+        {turn.answer && (
+          <Suspense fallback={<PlainAnswer turn={turn} />}>
+            <AnswerMarkdown turn={turn} />
+          </Suspense>
+        )}
+        {turn.status === 'error' && (
+          <p className={`text-sm text-red-600 dark:text-red-400 ${turn.answer ? 'mt-2' : ''}`}>
+            {turn.error}
+          </p>
+        )}
 
-      {turn.citations && turn.citations.length > 0 && (
-        <ol className="mt-4 space-y-2 text-sm">
-          {turn.citations.map((citation, i) => (
-            <li key={citation.id} id={`ask-source-${turn.id}-${i + 1}`} className="flex gap-3">
-              <span className="font-mono text-sage">[{i + 1}]</span>
-              <SourceLink citation={citation} />
-            </li>
-          ))}
-        </ol>
-      )}
+        {turn.citations && turn.citations.length > 0 && (
+          <ol className="mt-4 pt-3 border-t border-zinc-200 dark:border-zinc-700 space-y-2 text-sm">
+            {turn.citations.map((citation, i) => (
+              <li key={citation.id} id={`ask-source-${turn.id}-${i + 1}`} className="flex gap-3">
+                <span className="font-mono text-sage">[{i + 1}]</span>
+                <SourceLink citation={citation} />
+              </li>
+            ))}
+          </ol>
+        )}
+      </div>
     </div>
   )
 }
