@@ -15,12 +15,12 @@ const PENDING = '#ask-cite-pending'
  * sources once the answer is complete, muted dots while it streams (the
  * sources are not known yet). Markers the API did not confirm are dropped.
  */
-function withCitations(turn: Turn): string {
+function withCitations(turn: Turn, anchor: string): string {
   const numbers = new Map(turn.citations?.map((c, i) => [c.id, i + 1]))
   return turn.answer.replace(MARKER, (_, id: string) => {
     if (turn.status === 'streaming') return `[·](${PENDING})`
     const n = numbers.get(id)
-    return n ? `[${n}](#ask-source-${turn.id}-${n})` : ''
+    return n ? `[${n}](#${anchor}-${n})` : ''
   })
 }
 
@@ -32,8 +32,12 @@ function withCitations(turn: Turn): string {
  * Loaded lazily by the Ask section, with KaTeX for the math in answers
  * about the notes.
  */
-export default function AnswerMarkdown({ turn }: { turn: Turn }) {
-  const text = withCitations(turn) + (turn.status === 'streaming' ? ' ▍' : '')
+/**
+ * `anchor`: the id prefix of this answer's source list items, so the numbered
+ * citations jump to them.
+ */
+export default function AnswerMarkdown({ turn, anchor }: { turn: Turn; anchor: string }) {
+  const text = withCitations(turn, anchor) + (turn.status === 'streaming' ? ' ▍' : '')
   return (
     <div
       className="prose prose-zinc dark:prose-invert max-w-none text-[17px] leading-relaxed
@@ -53,7 +57,7 @@ export default function AnswerMarkdown({ turn }: { turn: Turn }) {
             if (href === PENDING) {
               return <sup className="font-mono text-[0.6em] text-zinc-400 ml-0.5">·</sup>
             }
-            if (href.startsWith('#ask-source-')) {
+            if (href.startsWith(`#${anchor}-`)) {
               return (
                 <sup className="ml-0.5 not-prose">
                   <a href={href} className="font-mono text-[0.6em] text-sage hover:underline">
