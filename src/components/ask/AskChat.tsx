@@ -44,16 +44,13 @@ function PlainAnswer({ turn }: { turn: Turn }) {
   )
 }
 
+// Named in each answer's header: the answers come from this model on the
+// owner's own server. Change it with the model (homelab apps/llm/vllm-ask.yaml).
+const MODEL = 'Qwen3.5-4B · home server'
+
 function SourceLink({ citation }: { citation: Citation }) {
   const href = citation.url
-  const label = (
-    <>
-      <span className="font-mono text-xs uppercase tracking-widest text-zinc-400 mr-2">
-        {citation.kind}
-      </span>
-      {citation.title}
-    </>
-  )
+  const label = citation.title
   if (!href) return <span>{label}</span>
   // Notes are pages in this app; projects and the resume PDF open in a new tab.
   if (href.startsWith('/') && !href.endsWith('.pdf')) {
@@ -88,34 +85,50 @@ function TurnView({ turn, anchor }: { turn: Turn; anchor: string }) {
         {turn.question}
       </p>
 
-      {/* The answer, outlined: a line and no fill, facing the question */}
-      <div className="mr-auto w-fit max-w-[92%] rounded-2xl rounded-bl-md border border-zinc-300 dark:border-white/70 px-5 py-4">
-        {waiting && (
-          <p className="flex items-center gap-2 text-zinc-400 text-sm">
-            <Loader2 className="w-4 h-4 animate-spin" /> Thinking…
-          </p>
-        )}
-        {turn.answer && (
-          <Suspense fallback={<PlainAnswer turn={turn} />}>
-            <AnswerMarkdown turn={turn} anchor={`${anchor}-${turn.id}`} />
-          </Suspense>
-        )}
-        {turn.truncated && (
-          <p className="mt-2 text-sm text-zinc-400 italic">
-            The answer got too long and was cut off. Try a narrower question.
-          </p>
-        )}
-        {turn.status === 'error' && (
-          <p className={`text-sm text-red-600 dark:text-red-400 ${turn.answer ? 'mt-2' : ''}`}>
-            {turn.error}
-          </p>
-        )}
+      {/* The answer, framed like a log entry: a header strip naming the
+          model, the text, then the sources as rows. Full width, so the frame
+          does not grow sideways as the answer streams in. */}
+      <div className="w-full max-w-[94%] rounded-xl border border-zinc-300 dark:border-white/70 overflow-hidden">
+        <div className="flex items-center justify-between gap-4 px-4 py-2 bg-paper-dark border-b border-zinc-200 dark:border-zinc-700 font-mono text-[11px] uppercase tracking-[0.14em]">
+          <span className="text-sage shrink-0">Answer</span>
+          <span className="text-zinc-faded truncate">{MODEL}</span>
+        </div>
+
+        <div className="px-4 py-4 sm:px-5">
+          {waiting && (
+            <p className="flex items-center gap-2 text-zinc-400 text-sm">
+              <Loader2 className="w-4 h-4 animate-spin" /> Thinking…
+            </p>
+          )}
+          {turn.answer && (
+            <Suspense fallback={<PlainAnswer turn={turn} />}>
+              <AnswerMarkdown turn={turn} anchor={`${anchor}-${turn.id}`} />
+            </Suspense>
+          )}
+          {turn.truncated && (
+            <p className="mt-2 text-sm text-zinc-400 italic">
+              The answer got too long and was cut off. Try a narrower question.
+            </p>
+          )}
+          {turn.status === 'error' && (
+            <p className={`text-sm text-red-600 dark:text-red-400 ${turn.answer ? 'mt-2' : ''}`}>
+              {turn.error}
+            </p>
+          )}
+        </div>
 
         {turn.citations && turn.citations.length > 0 && (
-          <ol className="mt-4 pt-3 border-t border-zinc-200 dark:border-zinc-700 space-y-2 text-sm">
+          <ol className="bg-paper-dark text-sm">
             {turn.citations.map((citation, i) => (
-              <li key={citation.id} id={`${anchor}-${turn.id}-${i + 1}`} className="flex gap-3">
-                <span className="font-mono text-sage">[{i + 1}]</span>
+              <li
+                key={citation.id}
+                id={`${anchor}-${turn.id}-${i + 1}`}
+                className="grid grid-cols-[2.25rem_4.5rem_minmax(0,1fr)] items-baseline gap-2 px-4 py-2 border-t border-zinc-200 dark:border-zinc-700"
+              >
+                <span className="font-mono text-[13px] text-sage">[{i + 1}]</span>
+                <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-faded">
+                  {citation.kind}
+                </span>
                 <SourceLink citation={citation} />
               </li>
             ))}
