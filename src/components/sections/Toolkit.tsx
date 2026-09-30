@@ -11,16 +11,16 @@ const education = [
   {
     school: 'Rice University',
     logo: '/rice-logo.png',
-    gpa: 'GPA 4.0',
+    gpa: 'GPA 4.0/4.0',
     degree: 'M.C.S., Computer Science — 2025-2026 (Expected Dec.)',
     detail: 'Database Implementation, Web Development, Big Data & ML',
   },
   {
     school: 'National Yang Ming Chiao Tung University',
     logo: '/NYCU-logo.png',
-    gpa: 'GPA 4.07',
+    gpa: 'GPA 4.07/4.3',
     degree: 'B.S., Industrial Engineering + CS Minor — 2020-2024',
-    detail: 'CS Minor GPA 4.13 · AI Capstone, Operating System, System Administration',
+    detail: 'CS Minor GPA 4.13/4.3 · AI Capstone, Operating System, System Administration',
   },
 ]
 
