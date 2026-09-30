@@ -1,3 +1,5 @@
+import { apiErrorMessage } from './client'
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.yarikama.com/api/v1'
 
 export interface LoginCredentials {
@@ -27,8 +29,8 @@ export const authService = {
     })
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({}))
-      throw new Error(error.error?.message || 'Login failed')
+      const body: unknown = await response.json().catch(() => null)
+      throw new Error(apiErrorMessage(body, response.status))
     }
 
     const data = await response.json()
