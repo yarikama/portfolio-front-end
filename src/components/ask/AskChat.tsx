@@ -199,7 +199,12 @@ export default function AskChat({ className = '', compact = false, autoFocus = f
           </div>
         </div>
       ) : (
-        turns.map((turn) => <TurnView key={turn.id} turn={turn} anchor={anchor} />)
+        // A column of reading width, however wide the box has opened.
+        <div className="max-w-3xl mx-auto">
+          {turns.map((turn) => (
+            <TurnView key={turn.id} turn={turn} anchor={anchor} />
+          ))}
+        </div>
       )}
     </div>
 
@@ -210,7 +215,7 @@ export default function AskChat({ className = '', compact = false, autoFocus = f
       }}
       className="border-t border-zinc-200 dark:border-zinc-700 p-3"
     >
-      <div className="flex items-end gap-2 rounded-2xl border border-zinc-200 dark:border-zinc-700 focus-within:border-ink dark:focus-within:border-zinc-400 transition-colors duration-300 pl-4 pr-2 py-2">
+      <div className="max-w-3xl mx-auto flex items-end gap-2 rounded-2xl border border-zinc-200 dark:border-zinc-700 focus-within:border-ink dark:focus-within:border-zinc-400 transition-colors duration-300 pl-4 pr-2 py-2">
         <label htmlFor={`${anchor}-question`} className="sr-only">
           Your question
         </label>
@@ -248,7 +253,7 @@ export default function AskChat({ className = '', compact = false, autoFocus = f
         )}
       </div>
       {question.length > MAX_QUESTION - 100 && (
-        <p className="mt-1 pr-2 text-right font-mono text-xs text-zinc-400">
+        <p className="max-w-3xl mx-auto mt-1 pr-2 text-right font-mono text-xs text-zinc-400">
           {question.length}/{MAX_QUESTION}
         </p>
       )}
