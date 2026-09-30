@@ -66,30 +66,35 @@ function TurnView({ turn }: { turn: Turn }) {
         {turn.question}
       </p>
 
-      {waiting && (
-        <p className="flex items-center gap-2 text-zinc-400 text-sm">
-          <Loader2 className="w-4 h-4 animate-spin" /> Thinking…
-        </p>
-      )}
-      {turn.answer && (
-        <Suspense fallback={<PlainAnswer turn={turn} />}>
-          <AnswerMarkdown turn={turn} />
-        </Suspense>
-      )}
-      {turn.status === 'error' && (
-        <p className="mt-2 text-sm text-red-600 dark:text-red-400">{turn.error}</p>
-      )}
+      {/* The answer, outlined: a line and no fill, facing the question */}
+      <div className="mr-auto w-fit max-w-[92%] rounded-2xl rounded-bl-md border border-zinc-300 dark:border-white/70 px-5 py-4">
+        {waiting && (
+          <p className="flex items-center gap-2 text-zinc-400 text-sm">
+            <Loader2 className="w-4 h-4 animate-spin" /> Thinking…
+          </p>
+        )}
+        {turn.answer && (
+          <Suspense fallback={<PlainAnswer turn={turn} />}>
+            <AnswerMarkdown turn={turn} />
+          </Suspense>
+        )}
+        {turn.status === 'error' && (
+          <p className={`text-sm text-red-600 dark:text-red-400 ${turn.answer ? 'mt-2' : ''}`}>
+            {turn.error}
+          </p>
+        )}
 
-      {turn.citations && turn.citations.length > 0 && (
-        <ol className="mt-4 space-y-2 text-sm">
-          {turn.citations.map((citation, i) => (
-            <li key={citation.id} id={`ask-source-${turn.id}-${i + 1}`} className="flex gap-3">
-              <span className="font-mono text-sage">[{i + 1}]</span>
-              <SourceLink citation={citation} />
-            </li>
-          ))}
-        </ol>
-      )}
+        {turn.citations && turn.citations.length > 0 && (
+          <ol className="mt-4 pt-3 border-t border-zinc-200 dark:border-zinc-700 space-y-2 text-sm">
+            {turn.citations.map((citation, i) => (
+              <li key={citation.id} id={`ask-source-${turn.id}-${i + 1}`} className="flex gap-3">
+                <span className="font-mono text-sage">[{i + 1}]</span>
+                <SourceLink citation={citation} />
+              </li>
+            ))}
+          </ol>
+        )}
+      </div>
     </div>
   )
 }
