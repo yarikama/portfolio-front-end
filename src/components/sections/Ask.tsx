@@ -78,6 +78,11 @@ function TurnView({ turn }: { turn: Turn }) {
             <AnswerMarkdown turn={turn} />
           </Suspense>
         )}
+        {turn.truncated && (
+          <p className="mt-2 text-sm text-zinc-400 italic">
+            The answer got too long and was cut off. Try a narrower question.
+          </p>
+        )}
         {turn.status === 'error' && (
           <p className={`text-sm text-red-600 dark:text-red-400 ${turn.answer ? 'mt-2' : ''}`}>
             {turn.error}
