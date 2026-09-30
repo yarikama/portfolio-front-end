@@ -7,11 +7,17 @@ import type { ExperienceEntry, ExperienceHighlight } from '../../types'
 
 // Right-hand text dial: one panel per role, turning around a horizontal axis
 const DIAL_STEP = 50
-const PANEL_HEIGHT = 600
+const PANEL_HEIGHT = 560
 const DIAL_RADIUS = PANEL_HEIGHT / 2 / Math.tan(((DIAL_STEP / 2) * Math.PI) / 180)
 
 // Left-hand line: every role is a stop on one vertical line, spaced this far apart
 const STOP_GAP = 240
+
+// Keep the pinned block clear of the fixed site header
+const NAV_CLEARANCE = 88
+
+const INTRO =
+  'An Industrial Engineering background taught me to optimize whole workflows, not just algorithms: from AI agents serving enterprise clients to the test infrastructure that proves they work.'
 
 // Every role in page order, remembering which company it belongs to
 const stops = experience.flatMap((entry, companyIndex) =>
@@ -103,11 +109,23 @@ function RolePanel({ stop }: { stop: (typeof stops)[number] }) {
   )
 }
 
+function SectionTitle() {
+  return (
+    <div>
+      <span className="font-mono text-sm text-zinc-400 uppercase tracking-widest">Experience</span>
+      <h2 className="font-serif text-4xl md:text-5xl font-light mt-4 tracking-tight">
+        Where I've <span className="italic">Shipped</span>
+      </h2>
+    </div>
+  )
+}
+
 // Desktop: on the left, one vertical line carries every company's logo and is
 // pulled along as you scroll so the current role sits level with the text. On
 // the right, each role's text sits on a dial that turns like a wheel.
 function ExperienceDrum() {
   const containerRef = useRef<HTMLDivElement>(null)
+  const pinnedRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const stopRefs = useRef<(HTMLDivElement | null)[]>([])
   const dialRef = useRef<HTMLDivElement>(null)
@@ -119,12 +137,19 @@ function ExperienceDrum() {
     let frame = 0
     const update = () => {
       frame = 0
-      if (!containerRef.current) return
+      if (!containerRef.current || !pinnedRef.current) return
+      // The title and the dial pin together, centred in the space under the
+      // site header; the turn runs from the moment they pin until the
+      // container carries them away
+      const pinnedHeight = pinnedRef.current.offsetHeight
+      const pinTop = Math.max(
+        NAV_CLEARANCE,
+        NAV_CLEARANCE + (window.innerHeight - NAV_CLEARANCE - pinnedHeight) / 2
+      )
+      const top = `${pinTop}px`
+      if (pinnedRef.current.style.top !== top) pinnedRef.current.style.top = top
       const rect = containerRef.current.getBoundingClientRect()
-      // The panel pins at the vertical centre of the screen; the turn runs
-      // from the moment it pins until the container carries it away
-      const pinTop = (window.innerHeight - PANEL_HEIGHT) / 2
-      const scrollable = containerRef.current.offsetHeight - PANEL_HEIGHT
+      const scrollable = containerRef.current.offsetHeight - pinnedHeight
       const raw = clamp01((pinTop - rect.top) / scrollable) * turns
       // Rest on each role for a moment, then turn to the next
       const segment = Math.min(Math.floor(raw), turns - 1)
@@ -170,11 +195,17 @@ function ExperienceDrum() {
   }, [turns])
 
   return (
-    <div ref={containerRef} className="relative" style={{ height: `calc(${PANEL_HEIGHT}px + ${turns * 90}dvh)` }}>
-      {/* Only as tall as the panel, so the next section follows straight after it */}
-      <div className="sticky" style={{ top: `calc((100dvh - ${PANEL_HEIGHT}px) / 2)` }}>
+    <div ref={containerRef} className="relative">
+      {/* Title and dial stay pinned as one block, so the title is always
+          above the line while the roles turn */}
+      <div ref={pinnedRef} className="sticky" style={{ top: NAV_CLEARANCE }}>
         <Container>
-          <div className="grid grid-cols-[320px_1fr] gap-16 items-center">
+          <div className="grid grid-cols-[1fr_minmax(0,26rem)] items-end gap-12">
+            <SectionTitle />
+            <p className="text-sm text-zinc-faded leading-relaxed">{INTRO}</p>
+          </div>
+          <MagazineLine className="mt-8" />
+          <div className="mt-2 grid grid-cols-[320px_1fr] gap-16 items-center">
             {/* One line, every company's logo on it; edges fade out */}
             <div
               className="relative overflow-hidden"
@@ -208,10 +239,15 @@ function ExperienceDrum() {
               </div>
             </div>
 
-            {/* Role text dial */}
+            {/* Role text dial; roles turning away fade out at its edges
+                instead of spilling over the title */}
             <div
               className="relative"
-              style={{ height: `${PANEL_HEIGHT}px`, perspective: '1600px', transformStyle: 'preserve-3d' }}
+              style={{
+                height: `${PANEL_HEIGHT}px`,
+                perspective: '1600px',
+                maskImage: 'linear-gradient(to bottom, transparent, black 4%, black 96%, transparent)',
+              }}
             >
               <div
                 ref={dialRef}
@@ -240,6 +276,8 @@ function ExperienceDrum() {
           </div>
         </Container>
       </div>
+      {/* Scroll distance for the turns */}
+      <div style={{ height: `${turns * 90}dvh` }} aria-hidden="true" />
     </div>
   )
 }
@@ -295,29 +333,22 @@ function ExperienceTimeline() {
 
 export default function Experience() {
   const reduceMotion = usePrefersReducedMotion()
-  // The drum needs room for a full panel; smaller screens get the flat timeline
-  const roomyScreen = useMediaQuery('(min-width: 1024px) and (min-height: 760px)')
+  // The pinned title and dial need about 680px under the site header;
+  // smaller screens get the flat timeline
+  const roomyScreen = useMediaQuery('(min-width: 1024px) and (min-height: 780px)')
   const useDrum = roomyScreen && !reduceMotion
 
   return (
     <section id="experience" className="pt-[var(--section-spacing)]">
-      <Container>
-        <span className="font-mono text-sm text-zinc-400 uppercase tracking-widest">Experience</span>
-        <h2 className="font-serif text-4xl md:text-5xl font-light mt-4 tracking-tight">
-          Where I've <span className="italic">Shipped</span>
-        </h2>
-        <p className="mt-4 text-zinc-faded max-w-2xl">
-          An Industrial Engineering background taught me to optimize whole workflows, not just
-          algorithms: from AI agents serving enterprise clients to the test infrastructure that
-          proves they work.
-        </p>
-        <MagazineLine className={useDrum ? 'mt-12' : 'my-12'} />
-      </Container>
-
       {useDrum ? (
         <ExperienceDrum />
       ) : (
         <div className="pb-[var(--section-spacing)]">
+          <Container>
+            <SectionTitle />
+            <p className="mt-4 text-zinc-faded max-w-2xl">{INTRO}</p>
+            <MagazineLine className="my-12" />
+          </Container>
           <ExperienceTimeline />
         </div>
       )}
