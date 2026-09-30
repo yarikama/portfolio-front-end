@@ -148,8 +148,16 @@ export default function Hero() {
             `}
           >
             <HeroPhoto
-              src="/hero-photo.webp"
-              cutoutSrc="/hero-cutout.webp"
+              // Split from one photo, far to near: sky and street, the bridge,
+              // the buildings on either side, the crowd (in black and white so
+              // Henry stands out), then Henry
+              layers={[
+                { src: '/hero/sky.webp', depth: 3 },
+                { src: '/hero/bridge.webp', depth: 7 },
+                { src: '/hero/buildings.webp', depth: 12 },
+                { src: '/hero/people.webp', depth: 17, grayscale: true },
+                { src: '/hero/henry.webp', depth: 20 },
+              ]}
               alt="Henry Hsu"
               width={960}
               height={1280}
