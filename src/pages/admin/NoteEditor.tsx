@@ -553,9 +553,8 @@ export default function NoteEditor() {
                   }}
                   {...autocomplete.handlers}
                   required
-                  rows={25}
                   className={`
-                    w-full px-4 py-3 bg-transparent border
+                    block w-full h-[calc(100vh-8rem)] min-h-[600px] px-4 py-3 bg-transparent border
                     font-mono text-sm leading-relaxed resize-y
                     focus:outline-none transition-colors
                     ${isDragging
@@ -594,7 +593,7 @@ Tip: Drag & drop or paste images directly here"
 
               {/* Preview */}
               {showPreview && (
-                <div className="border border-zinc-200 dark:border-zinc-700 p-4 overflow-y-auto max-h-[600px] bg-white dark:bg-zinc-900/50 rounded">
+                <div className="border border-zinc-200 dark:border-zinc-700 p-4 overflow-y-auto h-[calc(100vh-8rem)] min-h-[600px] bg-white dark:bg-zinc-900/50 rounded">
                   {formData.content ? (
                     <MarkdownRenderer content={formData.content} />
                   ) : (
