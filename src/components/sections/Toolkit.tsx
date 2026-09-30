@@ -52,9 +52,9 @@ function Eyebrow({ children }: { children: string }) {
   return <p className="font-mono text-sm text-zinc-400 uppercase tracking-widest">{children}</p>
 }
 
-function Badge({ children }: { children: string }) {
+function Badge({ children, className = 'text-xs' }: { children: string; className?: string }) {
   return (
-    <span className="font-mono text-xs text-sage border border-sage/40 px-1.5 py-0.5 whitespace-nowrap">
+    <span className={`font-mono text-sage border border-sage/40 px-1.5 py-0.5 whitespace-nowrap ${className}`}>
       {children}
     </span>
   )
@@ -248,9 +248,11 @@ export default function Toolkit() {
             <div key={school.school} className="flex items-start gap-4">
               <img src={school.logo} alt="" width={48} height={48} className="w-12 h-12 object-contain" />
               <div>
+                {/* A touch smaller than elsewhere, so NYCU's long name and its
+                    GPA fit on one line */}
                 <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-ink font-medium">{school.school}</p>
-                  <Badge>{school.gpa}</Badge>
+                  <p className="text-ink font-medium text-[15px]">{school.school}</p>
+                  <Badge className="text-[11px]">{school.gpa}</Badge>
                 </div>
                 <p className="mt-1 text-sm text-zinc-faded">{school.degree}</p>
                 <p className="text-xs text-zinc-400 mt-1">{school.detail}</p>
