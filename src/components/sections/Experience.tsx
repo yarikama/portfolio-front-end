@@ -121,8 +121,11 @@ function ExperienceDrum() {
       frame = 0
       if (!containerRef.current) return
       const rect = containerRef.current.getBoundingClientRect()
-      const scrollable = containerRef.current.offsetHeight - window.innerHeight
-      const raw = clamp01(-rect.top / scrollable) * turns
+      // The panel pins at the vertical centre of the screen; the turn runs
+      // from the moment it pins until the container carries it away
+      const pinTop = (window.innerHeight - PANEL_HEIGHT) / 2
+      const scrollable = containerRef.current.offsetHeight - PANEL_HEIGHT
+      const raw = clamp01((pinTop - rect.top) / scrollable) * turns
       // Rest on each role for a moment, then turn to the next
       const segment = Math.min(Math.floor(raw), turns - 1)
       const position = segment + smoothstep((raw - segment - 0.25) / 0.5)
@@ -167,9 +170,10 @@ function ExperienceDrum() {
   }, [turns])
 
   return (
-    <div ref={containerRef} className="relative" style={{ height: `${100 + turns * 90}dvh` }}>
-      <div className="sticky top-0 h-dvh flex items-center overflow-hidden">
-        <Container className="w-full">
+    <div ref={containerRef} className="relative" style={{ height: `calc(${PANEL_HEIGHT}px + ${turns * 90}dvh)` }}>
+      {/* Only as tall as the panel, so the next section follows straight after it */}
+      <div className="sticky" style={{ top: `calc((100dvh - ${PANEL_HEIGHT}px) / 2)` }}>
+        <Container>
           <div className="grid grid-cols-[320px_1fr] gap-16 items-center">
             {/* One line, every company's logo on it; edges fade out */}
             <div
