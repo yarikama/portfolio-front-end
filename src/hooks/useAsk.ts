@@ -8,6 +8,8 @@ export interface Turn {
   answer: string
   // Known once the answer is complete.
   citations: Citation[] | null
+  // Cut at the backend's length cap: the answer ends mid-sentence.
+  truncated?: boolean
   status: 'streaming' | 'done' | 'error'
   error?: string
 }
@@ -36,11 +38,11 @@ export function useAsk() {
     ])
 
     try {
-      const citations = await askQuestion(question, {
+      const { citations, truncated } = await askQuestion(question, {
         onToken: (text) => update(id, (t) => ({ answer: t.answer + text })),
         signal: abort.signal,
       })
-      update(id, () => ({ citations, status: 'done' }))
+      update(id, () => ({ citations, truncated, status: 'done' }))
     } catch (error) {
       if (abort.signal.aborted) {
         update(id, () => ({ citations: [], status: 'done' }))

@@ -7,6 +7,12 @@ export interface Citation {
   url: string | null
 }
 
+export interface AnswerEnd {
+  citations: Citation[]
+  // The answer hit the backend's length cap and ends mid-sentence.
+  truncated: boolean
+}
+
 interface AskHandlers {
   onToken: (text: string) => void
   signal?: AbortSignal
@@ -14,14 +20,15 @@ interface AskHandlers {
 
 /**
  * Ask a question about Henry's work. The answer streams back as server-sent
- * events: `token` pieces, then `done` with the sources it cited, or `error`
+ * events: `token` pieces, then `done` with the sources it cited (and whether
+ * it was cut at the length cap), or `error`
  * if it broke off. Limits and an offline model are ordinary error responses
  * (429, 503) and throw ApiRequestError with the API's message.
  */
 export async function askQuestion(
   question: string,
   { onToken, signal }: AskHandlers
-): Promise<Citation[]> {
+): Promise<AnswerEnd> {
   const response = await fetch(`${API_BASE_URL}/ask`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -49,7 +56,7 @@ export async function askQuestion(
     for (const raw of events) {
       const { event, data } = parseEvent(raw)
       if (event === 'token') onToken(data.text)
-      else if (event === 'done') return data.citations
+      else if (event === 'done') return { citations: data.citations, truncated: !!data.truncated }
       else if (event === 'error') throw new ApiRequestError(data.detail, 'STREAM_ERROR', 502)
     }
   }
