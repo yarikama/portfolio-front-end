@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useMemo, useEffect, useRef } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import Section from '../components/layout/Section'
 import ProjectCard from '../components/ui/ProjectCard'
 import MagazineLine from '../components/ui/MagazineLine'
@@ -30,6 +30,31 @@ export default function WorksPage() {
     }
     return projects.filter((p) => p.category.name === activeCategory)
   }, [projects, activeCategory])
+
+  // /works#<slug>, where the ask chat's project citations link: once that
+  // card is on the page, scroll to it and mark it for a moment. A category
+  // filter could hide it, so a new hash shows them all first.
+  const { hash } = useLocation()
+  const slug = decodeURIComponent(hash.slice(1))
+  const [marked, setMarked] = useState<string | null>(null)
+  const scrolledTo = useRef<string | null>(null)
+  useEffect(() => {
+    scrolledTo.current = null
+    if (slug) setActiveCategory('all')
+  }, [slug])
+  useEffect(() => {
+    if (!slug || scrolledTo.current === slug) return
+    const card = document.getElementById(slug)
+    if (!card) return
+    scrolledTo.current = slug
+    card.scrollIntoView({ block: 'center' })
+    setMarked(slug)
+  }, [slug, filteredProjects])
+  useEffect(() => {
+    if (!marked) return
+    const timer = setTimeout(() => setMarked(null), 2000)
+    return () => clearTimeout(timer)
+  }, [marked])
 
   return (
     <div className="pt-24">
@@ -95,7 +120,15 @@ export default function WorksPage() {
           <>
             <div className="space-y-12">
               {filteredProjects.map((project, index) => (
-                <ProjectCard key={project.id} project={project} index={index} />
+                <div
+                  key={project.id}
+                  id={project.slug}
+                  className={`scroll-mt-28 rounded-2xl outline-offset-8 transition-[outline-color] duration-700 motion-reduce:transition-none outline-2 ${
+                    marked === project.slug ? 'outline-sage' : 'outline-transparent'
+                  }`}
+                >
+                  <ProjectCard project={project} index={index} />
+                </div>
               ))}
             </div>
 

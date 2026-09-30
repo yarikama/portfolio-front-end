@@ -11,6 +11,7 @@ interface ProjectCardData {
   tags: string[]
   coverImage?: string | null
   link?: string | null
+  github?: string | null
   metrics?: string | null
 }
 
@@ -107,6 +108,33 @@ export default function ProjectCard({ project, index, featured = false }: Projec
           {project.metrics && (
             <div className="mt-4 font-mono text-sm text-zinc-faded">
               {project.metrics}
+            </div>
+          )}
+
+          {/* Always shown, not only on hover: the ask chat's citations land
+              on this card, and these are where to go from it. */}
+          {(project.github || (project.link && project.link !== project.github)) && (
+            <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
+              {project.github && (
+                <a
+                  href={project.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 font-mono text-xs uppercase tracking-widest text-sage hover:text-ink transition-colors"
+                >
+                  Code <ArrowUpRight size={14} aria-hidden="true" />
+                </a>
+              )}
+              {project.link && project.link !== project.github && (
+                <a
+                  href={project.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 font-mono text-xs uppercase tracking-widest text-sage hover:text-ink transition-colors"
+                >
+                  Link <ArrowUpRight size={14} aria-hidden="true" />
+                </a>
+              )}
             </div>
           )}
         </div>
