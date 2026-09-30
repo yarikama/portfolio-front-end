@@ -1,32 +1,39 @@
 import { useRef } from 'react'
 import { useFinePointer, usePrefersReducedMotion } from '../../hooks'
 
-interface HeroPhotoProps {
+export interface PhotoLayer {
   src: string
-  cutoutSrc: string
+  // How far (px) the layer drifts at the photo's edge; nearer layers drift more
+  depth: number
+  grayscale?: boolean
+}
+
+interface HeroPhotoProps {
+  // Back to front. The last layer is the subject and carries the alt text.
+  layers: PhotoLayer[]
   alt: string
   width: number
   height: number
   className?: string
 }
 
-export default function HeroPhoto({
-  src,
-  cutoutSrc,
-  alt,
-  width,
-  height,
-  className = '',
-}: HeroPhotoProps) {
+// Every layer is scaled up so drifting never reveals the frame's edge. It must
+// cover the largest depth at the smallest rendered width: 1 + 20px / (400px / 2).
+const OVERSCAN = 1.1
+
+const layerTransform = (x: number, y: number, depth: number) =>
+  `translate(${x * depth}px, ${y * depth}px) scale(${OVERSCAN})`
+
+export default function HeroPhoto({ layers, alt, width, height, className = '' }: HeroPhotoProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const bgRef = useRef<HTMLImageElement>(null)
-  const fgRef = useRef<HTMLImageElement>(null)
+  const layerRefs = useRef<(HTMLElement | null)[]>([])
   const parallaxEnabled = useFinePointer() && !usePrefersReducedMotion()
 
   // Write transforms straight to the DOM so mouse movement never re-renders
   const setParallax = (x: number, y: number) => {
-    if (bgRef.current) bgRef.current.style.transform = `translate(${x * 6}px, ${y * 6}px)`
-    if (fgRef.current) fgRef.current.style.transform = `translate(${x * 4}px, ${y * 4}px)`
+    layerRefs.current.forEach((el, i) => {
+      if (el) el.style.transform = layerTransform(x, y, layers[i].depth)
+    })
   }
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -38,6 +45,10 @@ export default function HeroPhoto({
     setParallax(x, y)
   }
 
+  const restTransform = { transform: layerTransform(0, 0, 0) }
+  const background = layers.slice(0, -1)
+  const subject = layers[layers.length - 1]
+
   return (
     <div
       ref={containerRef}
@@ -45,30 +56,36 @@ export default function HeroPhoto({
       onMouseMove={parallaxEnabled ? handleMouseMove : undefined}
       onMouseLeave={parallaxEnabled ? () => setParallax(0, 0) : undefined}
     >
-      {/* Background layer - moves more */}
-      <img
-        ref={bgRef}
-        src={src}
-        alt=""
-        aria-hidden="true"
-        width={width}
-        height={height}
-        fetchPriority="high"
-        className="hero-photo-bg"
-        draggable={false}
-      />
+      {background.map((layer, i) => (
+        <img
+          key={layer.src}
+          ref={(el) => {
+            layerRefs.current[i] = el
+          }}
+          src={layer.src}
+          alt=""
+          aria-hidden="true"
+          width={width}
+          height={height}
+          fetchPriority="high"
+          // The first layer sets the frame's size; the rest stack on top of it
+          className={i === 0 ? 'hero-photo-bg' : 'hero-photo-fg'}
+          style={{ ...restTransform, filter: layer.grayscale ? 'grayscale(1)' : undefined }}
+          draggable={false}
+        />
+      ))}
 
-      {/* Dotted overlay with gradient */}
-      <div className="hero-photo-bg-blur" aria-hidden="true" />
-
-      {/* Foreground layer (cutout) - moves less */}
       <img
-        ref={fgRef}
-        src={cutoutSrc}
+        ref={(el) => {
+          layerRefs.current[background.length] = el
+        }}
+        src={subject.src}
         alt={alt}
         width={width}
         height={height}
+        fetchPriority="high"
         className="hero-photo-fg"
+        style={restTransform}
         draggable={false}
       />
     </div>

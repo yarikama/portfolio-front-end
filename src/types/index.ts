@@ -58,6 +58,8 @@ export interface ExperienceRole {
 export interface ExperienceEntry {
   company: string
   url: string
+  // Square mark shown at the start of the company's timeline
+  logo: string
   tagline?: string
   location: string
   roles: ExperienceRole[]

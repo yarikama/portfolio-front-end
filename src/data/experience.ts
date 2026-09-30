@@ -5,6 +5,7 @@ export const experience: ExperienceEntry[] = [
   {
     company: 'Google',
     url: 'https://about.google/',
+    logo: '/logos/google.svg',
     location: 'Taipei, Taiwan',
     roles: [
       {
@@ -30,6 +31,7 @@ export const experience: ExperienceEntry[] = [
   {
     company: 'MaiAgent',
     url: 'https://docs.maiagent.ai/maiagent-user-guide/maiagent-user-guide-en/',
+    logo: '/logos/maiagent.svg',
     tagline: 'Award-Winning B2B GenAI Startup',
     location: 'Taipei, Taiwan',
     roles: [
