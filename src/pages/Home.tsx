@@ -12,9 +12,12 @@ export default function Home() {
     <>
       <Hero />
       <Ask />
-      <Manifesto />
-      <Experience />
-      <Toolkit />
+      {/* "About" in the header: the story, the experience and the skills */}
+      <div id="about">
+        <Manifesto />
+        <Experience />
+        <Toolkit />
+      </div>
       <BriefSelection />
       <LabNotes />
       <Contact />
