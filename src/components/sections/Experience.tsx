@@ -16,9 +16,6 @@ const STOP_GAP = 240
 // Keep the pinned block clear of the fixed site header
 const NAV_CLEARANCE = 88
 
-const INTRO =
-  'An Industrial Engineering background taught me to optimize whole workflows, not just algorithms: from AI agents serving enterprise clients to the test infrastructure that proves they work.'
-
 // Every role in page order, remembering which company it belongs to
 const stops = experience.flatMap((entry, companyIndex) =>
   entry.roles.map((role) => ({ entry, role, companyIndex }))
@@ -200,10 +197,7 @@ function ExperienceDrum() {
           above the line while the roles turn */}
       <div ref={pinnedRef} className="sticky" style={{ top: NAV_CLEARANCE }}>
         <Container>
-          <div className="grid grid-cols-[1fr_minmax(0,26rem)] items-end gap-12">
-            <SectionTitle />
-            <p className="text-sm text-zinc-faded leading-relaxed">{INTRO}</p>
-          </div>
+          <SectionTitle />
           <MagazineLine className="mt-8" />
           <div className="mt-2 grid grid-cols-[320px_1fr] gap-16 items-center">
             {/* One line, every company's logo on it; edges fade out */}
@@ -346,7 +340,6 @@ export default function Experience() {
         <div className="pb-[var(--section-spacing)]">
           <Container>
             <SectionTitle />
-            <p className="mt-4 text-zinc-faded max-w-2xl">{INTRO}</p>
             <MagazineLine className="my-12" />
           </Container>
           <ExperienceTimeline />
