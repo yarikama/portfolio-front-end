@@ -26,18 +26,13 @@ export class ApiClient {
     const response = await fetch(url, config)
 
     if (!response.ok) {
-      const errorData: ApiError = await response.json().catch(() => ({
-        error: {
-          code: 'UNKNOWN_ERROR',
-          message: `HTTP error ${response.status}`,
-        },
-      }))
-
+      const body: unknown = await response.json().catch(() => null)
+      const error = (body as Partial<ApiError> | null)?.error
       throw new ApiRequestError(
-        errorData.error.message,
-        errorData.error.code,
+        apiErrorMessage(body, response.status),
+        error?.code ?? `HTTP_${response.status}`,
         response.status,
-        errorData.error.details
+        error?.details
       )
     }
 
@@ -92,6 +87,21 @@ export class ApiClient {
       method: 'DELETE',
     })
   }
+}
+
+/**
+ * A readable message from an error response. The API (FastAPI) answers
+ * {"detail": "..."}, e.g. "Too many login attempts. Try again in 15
+ * minutes." on a 429; the {"error": {"message"}} shape is still accepted.
+ */
+export function apiErrorMessage(body: unknown, status: number): string {
+  if (body && typeof body === 'object') {
+    const { error, detail } = body as { error?: { message?: string }; detail?: unknown }
+    if (error?.message) return error.message
+    if (typeof detail === 'string') return detail
+  }
+  if (status === 429) return 'Too many requests. Please try again later.'
+  return `Request failed (HTTP ${status})`
 }
 
 export class ApiRequestError extends Error {
