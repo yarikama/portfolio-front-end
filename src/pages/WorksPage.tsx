@@ -12,7 +12,7 @@ const fallbackCategories = [
   { id: 'ml', name: 'ml', label: 'ML/AI', count: 0 },
 ]
 
-export default function ArchivePage() {
+export default function WorksPage() {
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const { projects, isLoading, error } = useProjects()
   const { categories: apiCategories } = useProjectCategories()
@@ -44,7 +44,7 @@ export default function ArchivePage() {
 
         <div className="mb-16">
           <span className="font-mono text-sm text-zinc-400 uppercase tracking-widest">
-            Archive
+            Works
           </span>
           <h1 className="font-serif text-5xl md:text-6xl font-light mt-4 tracking-tight">
             Complete Works

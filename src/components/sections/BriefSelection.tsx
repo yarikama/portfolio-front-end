@@ -46,7 +46,7 @@ export default function BriefSelection() {
 
       <div className="mt-16 text-center">
         <Link
-          to="/archive"
+          to="/works"
           className="
             inline-block font-mono text-xs uppercase tracking-widest
             text-zinc-faded hover:text-ink
@@ -54,7 +54,7 @@ export default function BriefSelection() {
             pb-1 transition-colors duration-300
           "
         >
-          View Full Archive
+          View All Works
         </Link>
       </div>
     </Section>

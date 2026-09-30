@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 import ScrollProgress from './components/ui/ScrollProgress'
@@ -8,7 +8,7 @@ import AskProvider from './components/ask/AskProvider'
 import AskWidget from './components/ask/AskWidget'
 import ProtectedRoute from './components/admin/ProtectedRoute'
 import Home from './pages/Home'
-import ArchivePage from './pages/ArchivePage'
+import WorksPage from './pages/WorksPage'
 import NotesPage from './pages/NotesPage'
 
 // Split out routes that pull in markdown/KaTeX or the admin editors, so the
@@ -126,7 +126,9 @@ function App() {
                     <Suspense fallback={<div className="min-h-dvh" />}>
                       <Routes>
                         <Route path="/" element={<Home />} />
-                        <Route path="/archive" element={<ArchivePage />} />
+                        <Route path="/works" element={<WorksPage />} />
+                        {/* The old name, still in links elsewhere */}
+                        <Route path="/archive" element={<Navigate to="/works" replace />} />
                         <Route path="/notes" element={<NotesPage />} />
                         <Route path="/notes/:slug" element={<NotePage />} />
                       </Routes>

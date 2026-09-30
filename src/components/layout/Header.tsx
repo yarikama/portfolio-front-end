@@ -8,29 +8,47 @@ interface NavItem {
   label: string
   href: string
   isRoute?: boolean
+  // The home page section that marks this item active while it is on screen
   sectionId?: string
 }
 
+// Works and Notes open their own pages, and are also marked while their
+// previews on the home page are on screen.
 const navItems: NavItem[] = [
-  { label: 'Experience', href: '/#experience', sectionId: 'experience' },
-  { label: 'Skills', href: '/#skills', sectionId: 'skills' },
-  { label: 'Works', href: '/#works', sectionId: 'works' },
-  { label: 'Archive', href: '/archive', isRoute: true },
-  { label: 'Notes', href: '/notes', isRoute: true },
+  { label: 'Ask', href: '/#ask', sectionId: 'ask' },
+  { label: 'About', href: '/#about', sectionId: 'about' },
+  { label: 'Works', href: '/works', isRoute: true, sectionId: 'works' },
+  { label: 'Notes', href: '/notes', isRoute: true, sectionId: 'notes' },
   { label: 'Contact', href: '/#contact', sectionId: 'contact' },
 ]
+
+/**
+ * Scrolls to a home page section. The Ask section also gets the cursor in
+ * its input, so the visitor can type right away; not on touch screens,
+ * where that would pop up the keyboard over the section.
+ */
+function scrollToSection(hash: string) {
+  const element = document.querySelector(hash)
+  if (!element) return
+  element.scrollIntoView()
+  if (hash === '#ask' && window.matchMedia('(pointer: fine)').matches) {
+    element.querySelector('textarea')?.focus({ preventScroll: true })
+  }
+}
 
 const sectionIds = navItems
   .filter((item) => item.sectionId)
   .map((item) => item.sectionId as string)
+const noSections: string[] = []
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const location = useLocation()
-  const activeSection = useScrollSpy({ sectionIds })
-
   const isHomePage = location.pathname === '/'
+  // The header stays mounted across pages: switching the list when the home
+  // page comes back makes the spy look up its freshly rendered sections.
+  const activeSection = useScrollSpy({ sectionIds: isHomePage ? sectionIds : noSections })
 
   useEffect(() => {
     const handleScroll = () => {
@@ -60,12 +78,9 @@ export default function Header() {
   // explicit behavior follows the CSS scroll-behavior, which honors reduced motion.
   useEffect(() => {
     if (location.hash) {
-      const element = document.querySelector(location.hash)
-      if (element) {
-        setTimeout(() => {
-          element.scrollIntoView()
-        }, 100)
-      }
+      const hash = location.hash
+      const timer = setTimeout(() => scrollToSection(hash), 100)
+      return () => clearTimeout(timer)
     }
   }, [location])
 
@@ -73,15 +88,15 @@ export default function Header() {
     setIsMenuOpen(false)
     if (!isRoute && href.startsWith('/#')) {
       if (location.pathname === '/') {
-        document.querySelector(href.substring(1))?.scrollIntoView()
+        scrollToSection(href.substring(1))
       }
     }
   }
 
   const isActive = (item: NavItem): boolean => {
     // For route-based items, check if current path starts with the href
-    if (item.isRoute) {
-      return location.pathname.startsWith(item.href)
+    if (item.isRoute && location.pathname.startsWith(item.href)) {
+      return true
     }
     // For section-based items, check scroll spy (only on home page)
     if (item.sectionId && isHomePage) {
