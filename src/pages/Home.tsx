@@ -1,4 +1,5 @@
 import Hero from '../components/sections/Hero'
+import Ask from '../components/sections/Ask'
 import Manifesto from '../components/sections/Manifesto'
 import BriefSelection from '../components/sections/BriefSelection'
 import Experience from '../components/sections/Experience'
@@ -10,6 +11,7 @@ export default function Home() {
   return (
     <>
       <Hero />
+      <Ask />
       <Manifesto />
       <Experience />
       <Toolkit />
