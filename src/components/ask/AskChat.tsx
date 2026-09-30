@@ -7,10 +7,18 @@ import type { Citation } from '../../services/api'
 
 const MAX_QUESTION = 500
 
+// One per language the model answers well, each on a narrow topic: broad
+// questions ("every project") run long, most of all in scripts that take
+// many tokens per word, such as Devanagari.
 const SUGGESTIONS = [
   'What did Henry build at Google?',
   'What is PAPIT?',
   '他做過哪些 LLM 安全的研究？',
+  'ヘンリーはGoogleで何をしましたか？',
+  '헨리는 오픈소스에 어떤 기여를 했나요?',
+  "Quelle est la formation d'Henry ?",
+  '¿Qué experiencia tiene Henry con RAG?',
+  'हेनरी कौन-सी प्रोग्रामिंग भाषाएँ जानते हैं?',
 ]
 
 // Markdown (with math) is loaded with the first answer, not with the page.
@@ -126,7 +134,7 @@ export default function AskChat({ className = '', compact = false, autoFocus = f
 
   useEffect(() => {
     const el = log.current
-    if (el && following.current) el.scrollTop = el.scrollHeight
+    if (el && following.current && turns.length) el.scrollTop = el.scrollHeight
   }, [turns])
 
   useEffect(() => {
@@ -173,7 +181,9 @@ export default function AskChat({ className = '', compact = false, autoFocus = f
       className={`flex-1 overflow-y-auto overscroll-contain ${compact ? 'px-4' : 'px-5 md:px-8'}`}
     >
       {turns.length === 0 ? (
-        <div className="h-full flex flex-col items-center justify-center gap-4 text-center">
+        // min-h-full, not h-full: centred when it fits, scrollable when it
+        // does not (a fixed height would cut the top off on small screens).
+        <div className="min-h-full py-6 flex flex-col items-center justify-center gap-4 text-center">
           <p className="font-serif text-xl italic text-zinc-faded">Try asking</p>
           <div className="flex flex-wrap justify-center gap-2">
             {SUGGESTIONS.map((s) => (
