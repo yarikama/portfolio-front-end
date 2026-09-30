@@ -201,28 +201,9 @@ export default function Toolkit() {
       <MagazineLine className="my-12" />
 
       <div className="grid lg:grid-cols-2 gap-16 lg:gap-20">
-        <div className="space-y-12">
-          <div>
-            <Eyebrow>Skill Set</Eyebrow>
-            <TechTable data={techStack} className="mt-6" />
-          </div>
-
-          <div className="space-y-4">
-            <Eyebrow>Education</Eyebrow>
-            {education.map((school) => (
-              <div key={school.school} className="flex items-start gap-3">
-                <img src={school.logo} alt="" width={48} height={48} className="w-12 h-12 object-contain" />
-                <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="text-ink font-medium">{school.school}</p>
-                    <Badge>{school.gpa}</Badge>
-                  </div>
-                  <p className="text-sm text-zinc-faded">{school.degree}</p>
-                  <p className="text-xs text-zinc-400 mt-1">{school.detail}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+        <div>
+          <Eyebrow>Skill Set</Eyebrow>
+          <TechTable data={techStack} className="mt-6" />
         </div>
 
         <div className="space-y-12">
@@ -256,6 +237,26 @@ export default function Toolkit() {
               ))}
             </ul>
           </div>
+        </div>
+      </div>
+
+      {/* Education runs the full width below, one school per column */}
+      <div className="mt-20">
+        <Eyebrow>Education</Eyebrow>
+        <div className="mt-6 grid md:grid-cols-2 gap-10 lg:gap-20">
+          {education.map((school) => (
+            <div key={school.school} className="flex items-start gap-4">
+              <img src={school.logo} alt="" width={48} height={48} className="w-12 h-12 object-contain" />
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-ink font-medium">{school.school}</p>
+                  <Badge>{school.gpa}</Badge>
+                </div>
+                <p className="mt-1 text-sm text-zinc-faded">{school.degree}</p>
+                <p className="text-xs text-zinc-400 mt-1">{school.detail}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </Section>
