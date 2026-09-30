@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useId, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowUp, Loader2, Square } from 'lucide-react'
+import { ArrowUp, Loader2, Square, X } from 'lucide-react'
 import { useAskChat } from '../../hooks'
 import type { Turn } from '../../hooks'
 import type { Citation } from '../../services/api'
@@ -20,6 +20,17 @@ const SUGGESTIONS = [
   '¿Qué experiencia tiene Henry con RAG?',
   'हेनरी कौन-सी प्रोग्रामिंग भाषाएँ जानते हैं?',
 ]
+
+/**
+ * The question for a highlighted passage when the visitor adds none, in the
+ * passage's language: the model answers in the language of the question.
+ */
+function explainQuestion(passage: string): string {
+  if (/[\u3040-\u30ff]/.test(passage)) return 'この部分を説明してください。'
+  if (/[\uac00-\ud7af]/.test(passage)) return '이 부분을 설명해 주세요.'
+  if (/[\u4e00-\u9fff]/.test(passage)) return '請解釋這段內容。'
+  return 'Explain this passage.'
+}
 
 // Markdown (with math) is loaded with the first answer, not with the page.
 const AnswerMarkdown = lazy(() => import('../ui/AnswerMarkdown'))
@@ -68,6 +79,11 @@ function TurnView({ turn, anchor }: { turn: Turn; anchor: string }) {
   const waiting = turn.status === 'streaming' && !turn.answer
   return (
     <div className="py-5">
+      {turn.passage && (
+        <blockquote className="ml-auto w-fit max-w-[85%] mb-2 border-l-2 border-sage/60 pl-3 text-sm italic text-zinc-400 line-clamp-3">
+          {turn.passage.text}
+        </blockquote>
+      )}
       <p className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-md bg-sage/10 px-4 py-2 mb-4 text-zinc-faded">
         {turn.question}
       </p>
@@ -123,7 +139,7 @@ interface AskChatProps {
  * floating chat both render one, over the same conversation (AskProvider).
  */
 export default function AskChat({ className = '', compact = false, autoFocus = false }: AskChatProps) {
-  const { turns, ask, stop, isStreaming } = useAskChat()
+  const { turns, ask, stop, isStreaming, passage, setPassage } = useAskChat()
   const [question, setQuestion] = useState('')
   const log = useRef<HTMLDivElement>(null)
   const input = useRef<HTMLTextAreaElement>(null)
@@ -154,12 +170,16 @@ export default function AskChat({ className = '', compact = false, autoFocus = f
     if (el) following.current = el.scrollHeight - el.scrollTop - el.clientHeight < 40
   }
 
-  const submit = (text: string) => {
-    const q = text.trim()
+  // Suggestions are questions of their own; typed ones go with the
+  // highlighted passage, if there is one.
+  const submit = (text: string, withPassage = true) => {
+    const about = withPassage ? passage : null
+    const q = text.trim() || (about ? explainQuestion(about.text) : '')
     if (!q || isStreaming) return
     setQuestion('')
+    if (about) setPassage(null)
     following.current = true
-    ask(q)
+    ask(q, about ?? undefined)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -190,7 +210,7 @@ export default function AskChat({ className = '', compact = false, autoFocus = f
               <button
                 key={s}
                 type="button"
-                onClick={() => submit(s)}
+                onClick={() => submit(s, false)}
                 className="rounded-full font-mono text-xs text-zinc-400 hover:text-sage border border-zinc-200 dark:border-zinc-700 hover:border-sage px-4 py-2 transition-colors"
               >
                 {s}
@@ -215,6 +235,21 @@ export default function AskChat({ className = '', compact = false, autoFocus = f
       }}
       className="border-t border-zinc-200 dark:border-zinc-700 p-3"
     >
+      {passage && (
+        <div className="max-w-3xl mx-auto mb-2 flex items-start gap-2 rounded-xl bg-sage/10 pl-3 pr-1 py-2">
+          <blockquote className="flex-1 border-l-2 border-sage/60 pl-3 text-sm italic text-zinc-faded line-clamp-3">
+            {passage.text}
+          </blockquote>
+          <button
+            type="button"
+            onClick={() => setPassage(null)}
+            aria-label="Remove the highlighted passage"
+            className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-zinc-400 hover:text-ink hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
       <div className="max-w-3xl mx-auto flex items-end gap-2 rounded-2xl border border-zinc-200 dark:border-zinc-700 focus-within:border-ink dark:focus-within:border-zinc-400 transition-colors duration-300 pl-4 pr-2 py-2">
         <label htmlFor={`${anchor}-question`} className="sr-only">
           Your question
@@ -227,7 +262,7 @@ export default function AskChat({ className = '', compact = false, autoFocus = f
           onKeyDown={handleKeyDown}
           maxLength={MAX_QUESTION}
           rows={1}
-          placeholder="Ask about my work…"
+          placeholder={passage ? 'Ask about it, or press Enter' : 'Ask about my work…'}
           // The border around it shows focus, so the site-wide ring
           // would draw a second box inside it.
           className={`flex-1 self-center resize-none bg-transparent font-serif focus-visible:outline-none! ${compact ? 'text-base' : 'text-lg'}`}
@@ -244,7 +279,7 @@ export default function AskChat({ className = '', compact = false, autoFocus = f
         ) : (
           <button
             type="submit"
-            disabled={!question.trim()}
+            disabled={!question.trim() && !passage}
             aria-label="Ask"
             className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center bg-sage text-paper disabled:opacity-40 transition-opacity"
           >

@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { askQuestion, ApiRequestError } from '../services/api'
-import type { Citation } from '../services/api'
+import type { Citation, Passage } from '../services/api'
 
 export interface Turn {
   id: number
   question: string
+  // What the question is about, when the visitor highlighted it on the site.
+  passage?: Passage
   answer: string
   // Known once the answer is complete.
   citations: Citation[] | null
@@ -27,20 +29,21 @@ export function useAsk() {
   const update = (id: number, change: (turn: Turn) => Partial<Turn>) =>
     setTurns((all) => all.map((t) => (t.id === id ? { ...t, ...change(t) } : t)))
 
-  const ask = useCallback(async (question: string) => {
+  const ask = useCallback(async (question: string, passage?: Passage) => {
     controller.current?.abort()
     const abort = new AbortController()
     controller.current = abort
     const id = nextId.current++
     setTurns((all) => [
       ...all,
-      { id, question, answer: '', citations: null, status: 'streaming' },
+      { id, question, passage, answer: '', citations: null, status: 'streaming' },
     ])
 
     try {
       const { citations, truncated } = await askQuestion(question, {
         onToken: (text) => update(id, (t) => ({ answer: t.answer + text })),
         signal: abort.signal,
+        passage,
       })
       update(id, () => ({ citations, truncated, status: 'done' }))
     } catch (error) {
