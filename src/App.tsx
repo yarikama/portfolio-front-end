@@ -4,6 +4,8 @@ import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 import ScrollProgress from './components/ui/ScrollProgress'
 import CursorFollower from './components/ui/CursorFollower'
+import AskProvider from './components/ask/AskProvider'
+import AskWidget from './components/ask/AskWidget'
 import ProtectedRoute from './components/admin/ProtectedRoute'
 import Home from './pages/Home'
 import ArchivePage from './pages/ArchivePage'
@@ -113,22 +115,27 @@ function App() {
           <Route
             path="*"
             element={
-              <div className="min-h-dvh bg-paper text-ink">
-                <CursorFollower />
-                <ScrollProgress />
-                <Header />
-                <main className="pb-24">
-                  <Suspense fallback={<div className="min-h-dvh" />}>
-                    <Routes>
-                      <Route path="/" element={<Home />} />
-                      <Route path="/archive" element={<ArchivePage />} />
-                      <Route path="/notes" element={<NotesPage />} />
-                      <Route path="/notes/:slug" element={<NotePage />} />
-                    </Routes>
-                  </Suspense>
-                </main>
-                <Footer />
-              </div>
+              // One ask conversation for every public page: the home page
+              // section and the floating chat share it.
+              <AskProvider>
+                <div className="min-h-dvh bg-paper text-ink">
+                  <CursorFollower />
+                  <ScrollProgress />
+                  <Header />
+                  <main className="pb-24">
+                    <Suspense fallback={<div className="min-h-dvh" />}>
+                      <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/archive" element={<ArchivePage />} />
+                        <Route path="/notes" element={<NotesPage />} />
+                        <Route path="/notes/:slug" element={<NotePage />} />
+                      </Routes>
+                    </Suspense>
+                  </main>
+                  <Footer />
+                  <AskWidget />
+                </div>
+              </AskProvider>
             }
           />
         </Routes>
