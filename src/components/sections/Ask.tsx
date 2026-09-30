@@ -25,6 +25,10 @@ export default function Ask() {
             site and my resume, with sources. It can be wrong, so check the links. Ask in any
             language.
           </p>
+          <p className="mt-3 text-sm text-zinc-faded max-w-2xl">
+            To fit on one home GPU, it has no memory: each question is answered on its own,
+            without the ones before it.
+          </p>
         </div>
 
         <MagazineLine className="mb-8" />

@@ -300,10 +300,17 @@ export default function AskChat({ className = '', compact = false, autoFocus = f
           </button>
         )}
       </div>
-      {question.length > MAX_QUESTION - 100 && (
-        <p className="max-w-3xl mx-auto mt-1 pr-2 text-right font-mono text-xs text-zinc-400">
-          {question.length}/{MAX_QUESTION}
-        </p>
+      {(turns.length > 0 || question.length > MAX_QUESTION - 100) && (
+        <div className="max-w-3xl mx-auto mt-1.5 px-2 flex justify-between gap-4 text-xs text-zinc-faded">
+          {/* Once there is a conversation, follow-ups are what this is for:
+              the model sees only the question it is answering. */}
+          <p>{turns.length > 0 && 'No memory between questions: name the topic again in a follow-up.'}</p>
+          {question.length > MAX_QUESTION - 100 && (
+            <p className="shrink-0 font-mono">
+              {question.length}/{MAX_QUESTION}
+            </p>
+          )}
+        </div>
       )}
     </form>
   </div>
