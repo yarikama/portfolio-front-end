@@ -27,7 +27,9 @@ const layerTransform = (x: number, y: number, depth: number) =>
 export default function HeroPhoto({ layers, alt, width, height, className = '' }: HeroPhotoProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const layerRefs = useRef<(HTMLElement | null)[]>([])
-  const parallaxEnabled = useFinePointer() && !usePrefersReducedMotion()
+  const finePointer = useFinePointer()
+  const reducedMotion = usePrefersReducedMotion()
+  const parallaxEnabled = finePointer && !reducedMotion
 
   // Write transforms straight to the DOM so mouse movement never re-renders
   const setParallax = (x: number, y: number) => {

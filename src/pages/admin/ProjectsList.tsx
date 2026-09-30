@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { adminProjectsService } from '../../services/api'
-import { Plus, Edit, Trash2, Loader2, Eye, Star, ExternalLink } from 'lucide-react'
+import { Plus, Edit, Trash2, Loader2, Star, ExternalLink } from 'lucide-react'
 import AdminNav from '../../components/admin/AdminNav'
 import type { Project } from '../../types'
 
 export default function AdminProjectsList() {
-  const navigate = useNavigate()
   const [projects, setProjects] = useState<Project[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -18,7 +17,7 @@ export default function AdminProjectsList() {
     try {
       const response = await adminProjectsService.getAll(100)
       setProjects(response.data)
-    } catch (err) {
+    } catch {
       setError('Failed to load projects')
     } finally {
       setIsLoading(false)
@@ -36,7 +35,7 @@ export default function AdminProjectsList() {
     try {
       await adminProjectsService.delete(id)
       fetchProjects()
-    } catch (err) {
+    } catch {
       alert('Failed to delete project')
     } finally {
       setDeletingId(null)

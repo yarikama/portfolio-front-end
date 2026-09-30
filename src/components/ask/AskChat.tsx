@@ -4,6 +4,7 @@ import { ArrowUp, Loader2, Square, X } from 'lucide-react'
 import { useAskChat } from '../../hooks'
 import type { Turn } from '../../hooks'
 import type { Citation } from '../../services/api'
+import { explainQuestion, withoutCitations } from '../../lib/ask'
 
 const MAX_QUESTION = 500
 
@@ -21,17 +22,6 @@ const SUGGESTIONS = [
   'हेनरी कौन-सी प्रोग्रामिंग भाषाएँ जानते हैं?',
 ]
 
-/**
- * The question for a highlighted passage when the visitor adds none, in the
- * passage's language: the model answers in the language of the question.
- */
-function explainQuestion(passage: string): string {
-  if (/[\u3040-\u30ff]/.test(passage)) return 'この部分を説明してください。'
-  if (/[\uac00-\ud7af]/.test(passage)) return '이 부분을 설명해 주세요.'
-  if (/[\u4e00-\u9fff]/.test(passage)) return '請解釋這段內容。'
-  return 'Explain this passage.'
-}
-
 // Markdown (with math) is loaded with the first answer, not with the page.
 const AnswerMarkdown = lazy(() => import('../ui/AnswerMarkdown'))
 
@@ -39,7 +29,7 @@ const AnswerMarkdown = lazy(() => import('../ui/AnswerMarkdown'))
 function PlainAnswer({ turn }: { turn: Turn }) {
   return (
     <p className="text-[17px] leading-relaxed whitespace-pre-wrap">
-      {turn.answer.replace(/[ \t]*\[[PNR]\d+\]/g, '')}
+      {withoutCitations(turn.answer)}
     </p>
   )
 }

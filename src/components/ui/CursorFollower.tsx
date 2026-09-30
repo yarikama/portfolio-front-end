@@ -98,6 +98,10 @@ function CursorTrail() {
 
 // A sage trail behind the system cursor, only for mouse users who allow motion
 export default function CursorFollower() {
-  const enabled = useFinePointer() && !usePrefersReducedMotion()
+  // Both hooks run on every render: `a() && !b()` would skip the second
+  // whenever the pointer is not fine, changing the hook order.
+  const finePointer = useFinePointer()
+  const reducedMotion = usePrefersReducedMotion()
+  const enabled = finePointer && !reducedMotion
   return enabled ? <CursorTrail /> : null
 }

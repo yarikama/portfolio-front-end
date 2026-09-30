@@ -9,7 +9,9 @@ const drift = (x: number, y: number) => ({
 
 export default function GeometricDecor() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const parallaxEnabled = useFinePointer() && !usePrefersReducedMotion()
+  const finePointer = useFinePointer()
+  const reducedMotion = usePrefersReducedMotion()
+  const parallaxEnabled = finePointer && !reducedMotion
 
   // Write the mouse offset to CSS variables so movement never re-renders
   useEffect(() => {

@@ -90,6 +90,8 @@ export function useNoteDraft<T>({ noteId, data, ready, onRestore }: Options<T>) 
     } else if (draft) {
       remove(key)
     }
+    // setOffer is a new function each render but always does the same.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, key, snapshot])
 
   // Write edits after a pause. Paused while a draft is on offer, so the old

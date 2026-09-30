@@ -19,7 +19,7 @@ export default function AdminCategoriesList() {
       // Sort by order
       const sorted = [...response.data].sort((a, b) => a.order - b.order)
       setCategories(sorted)
-    } catch (err) {
+    } catch {
       setError('Failed to load categories')
     } finally {
       setIsLoading(false)

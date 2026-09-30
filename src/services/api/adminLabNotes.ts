@@ -14,7 +14,7 @@ export interface CreateLabNoteData {
   published: boolean
 }
 
-export interface UpdateLabNoteData extends Partial<CreateLabNoteData> {}
+export type UpdateLabNoteData = Partial<CreateLabNoteData>
 
 async function authFetch<T>(url: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(url, {

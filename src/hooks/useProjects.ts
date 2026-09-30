@@ -35,6 +35,9 @@ export function useProjects(params?: ProjectsQueryParams) {
         error: error instanceof Error ? error : new Error('Failed to fetch projects'),
       }))
     }
+    // Field by field: a caller's inline params object is new on every
+    // render, and depending on it would refetch every time.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params?.category_id, params?.featured, params?.tag, params?.limit, params?.offset])
 
   useEffect(() => {
