@@ -11,9 +11,8 @@ import { useAskChat } from '../../hooks'
  * screen so there are never two chat boxes in view.
  */
 export default function AskWidget() {
-  const [open, setOpen] = useState(false)
   const [sectionInView, setSectionInView] = useState(false)
-  const { isStreaming } = useAskChat()
+  const { isStreaming, widgetOpen: open, setWidgetOpen: setOpen } = useAskChat()
   const { pathname } = useLocation()
 
   // Watch the home page's Ask section, when the page has one.
@@ -35,7 +34,7 @@ export default function AskWidget() {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [open])
+  }, [open, setOpen])
 
   const hidden = sectionInView && !open
 

@@ -6,6 +6,7 @@ import ScrollProgress from './components/ui/ScrollProgress'
 import CursorFollower from './components/ui/CursorFollower'
 import AskProvider from './components/ask/AskProvider'
 import AskWidget from './components/ask/AskWidget'
+import SelectionAsk from './components/ask/SelectionAsk'
 import ProtectedRoute from './components/admin/ProtectedRoute'
 import Home from './pages/Home'
 import WorksPage from './pages/WorksPage'
@@ -136,6 +137,7 @@ function App() {
                   </main>
                   <Footer />
                   <AskWidget />
+                  <SelectionAsk />
                 </div>
               </AskProvider>
             }

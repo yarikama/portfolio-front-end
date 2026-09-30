@@ -13,13 +13,25 @@ export interface AnswerEnd {
   truncated: boolean
 }
 
+// A passage the visitor highlighted on the site to ask about, and the path
+// of the page it is on.
+export interface Passage {
+  text: string
+  page: string
+}
+
+// The API's limit on a passage; longer selections are cut to it.
+export const MAX_PASSAGE = 600
+
 interface AskHandlers {
   onToken: (text: string) => void
   signal?: AbortSignal
+  passage?: Passage | null
 }
 
 /**
- * Ask a question about Henry's work. The answer streams back as server-sent
+ * Ask a question about Henry's work, optionally about a passage on the
+ * site. The answer streams back as server-sent
  * events: `token` pieces, then `done` with the sources it cited (and whether
  * it was cut at the length cap), or `error`
  * if it broke off. Limits and an offline model are ordinary error responses
@@ -27,12 +39,13 @@ interface AskHandlers {
  */
 export async function askQuestion(
   question: string,
-  { onToken, signal }: AskHandlers
+  { onToken, signal, passage }: AskHandlers
 ): Promise<AnswerEnd> {
+  const body = passage ? { question, quote: passage.text, page: passage.page } : { question }
   const response = await fetch(`${API_BASE_URL}/ask`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ question }),
+    body: JSON.stringify(body),
     signal,
   })
   if (!response.ok || !response.body) {
