@@ -5,6 +5,7 @@ import rehypeKatex from 'rehype-katex'
 import rehypeHighlight from 'rehype-highlight'
 import 'katex/dist/katex.min.css'
 import 'highlight.js/styles/github-dark.css'
+import ResponsiveImage from './ResponsiveImage'
 
 interface MarkdownRendererProps {
   content: string
@@ -31,6 +32,11 @@ export default function MarkdownRenderer({ content, className = '' }: MarkdownRe
       <ReactMarkdown
         remarkPlugins={[remarkMath, remarkGfm]}
         rehypePlugins={[rehypeKatex, rehypeHighlight]}
+        components={{
+          img: ({ node, ...props }) => (
+            <ResponsiveImage {...props} sizes="(max-width: 768px) 100vw, 768px" />
+          ),
+        }}
       >
         {content}
       </ReactMarkdown>

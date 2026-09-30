@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import ResponsiveImage from './ResponsiveImage'
 import { ArrowUpRight } from 'lucide-react'
 import MagazineLine from './MagazineLine'
 
@@ -58,7 +59,7 @@ export default function ProjectCard({ project, index, featured = false }: Projec
             transform: 'translate(0, 0)',
           }}
         >
-          <img src={project.coverImage} alt="" className="w-full h-full object-cover" />
+          <ResponsiveImage src={project.coverImage} alt="" sizes="256px" loading="eager" className="w-full h-full object-cover" />
         </div>
       )}
 
