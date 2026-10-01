@@ -1,8 +1,13 @@
 {
-  "name": "portfolio",
+  "name": "portfolio-front-end",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
+  "description": "The front end of yarikama.com: portfolio, notes and a self-hosted LLM chat",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yarikama/portfolio-front-end.git"
+  },
+  "type": "commonjs",
   "scripts": {
     "test": "vitest run",
     "lint": "eslint . --max-warnings 0",
@@ -10,14 +15,6 @@
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
-  "repository": {
-    "type": "git",
-    "url": "git@github-personal:yarikama/portfolio.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.18",
     "@tailwindcss/typography": "^0.5.19",

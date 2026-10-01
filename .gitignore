@@ -17,3 +17,5 @@ dist
 .claude/settings.local.json
 .cursor
 .playwright-mcp
+# macOS
+.DS_Store

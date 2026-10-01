@@ -130,8 +130,6 @@ export default function ProjectEditor() {
 
     try {
       const result = await uploadService.uploadImage(file, 'covers')
-      console.log('Upload result:', result)
-      console.log('Setting coverImage to:', result.url)
       setFormData((prev) => ({ ...prev, coverImage: result.url }))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to upload image')
@@ -161,9 +159,6 @@ export default function ProjectEditor() {
     e.preventDefault()
     setError(null)
     setIsSaving(true)
-
-    console.log('Submitting formData:', formData)
-    console.log('coverImage:', formData.coverImage)
 
     try {
       if (isEditing && id) {
