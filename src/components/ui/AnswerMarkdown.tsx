@@ -4,25 +4,7 @@ import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import 'katex/dist/katex.min.css'
 import type { Turn } from '../../hooks'
-
-// Markers sit right after their sentence, without the space the model
-// tends to put before them.
-const MARKER = /[ \t]*\[([PNR]\d+)\]/g
-const PENDING = '#ask-cite-pending'
-
-/**
- * The answer's [P1]-style markers as Markdown links: numbered links to the
- * sources once the answer is complete, muted dots while it streams (the
- * sources are not known yet). Markers the API did not confirm are dropped.
- */
-function withCitations(turn: Turn, anchor: string): string {
-  const numbers = new Map(turn.citations?.map((c, i) => [c.id, i + 1]))
-  return turn.answer.replace(MARKER, (_, id: string) => {
-    if (turn.status === 'streaming') return `[·](${PENDING})`
-    const n = numbers.get(id)
-    return n ? `[${n}](#${anchor}-${n})` : ''
-  })
-}
+import { CITATION_PENDING as PENDING, withCitations } from '../../lib/ask'
 
 /**
  * An answer from the ask chat, rendered as Markdown. The text comes from a

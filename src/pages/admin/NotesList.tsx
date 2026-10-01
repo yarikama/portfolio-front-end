@@ -1,12 +1,11 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { adminLabNotesService } from '../../services/api'
 import { Plus, Edit, Trash2, Loader2, Eye, Search } from 'lucide-react'
 import AdminNav from '../../components/admin/AdminNav'
 import type { LabNote } from '../../types'
 
 export default function AdminNotesList() {
-  const navigate = useNavigate()
   const [notes, setNotes] = useState<LabNote[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -25,7 +24,7 @@ export default function AdminNotesList() {
     try {
       const response = await adminLabNotesService.getAll(100)
       setNotes(response.data)
-    } catch (err) {
+    } catch {
       setError('Failed to load notes')
     } finally {
       setIsLoading(false)
@@ -43,7 +42,7 @@ export default function AdminNotesList() {
     try {
       await adminLabNotesService.delete(id)
       fetchNotes()
-    } catch (err) {
+    } catch {
       alert('Failed to delete note')
     } finally {
       setDeletingId(null)

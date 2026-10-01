@@ -1,4 +1,3 @@
-import { apiClient } from './client'
 import { authService } from './auth'
 import type { ApiResponse, PaginatedResponse, Project } from '../../types'
 
@@ -19,7 +18,7 @@ export interface CreateProjectData {
   published: boolean
 }
 
-export interface UpdateProjectData extends Partial<CreateProjectData> {}
+export type UpdateProjectData = Partial<CreateProjectData>
 
 class AdminProjectsService {
   private getAuthHeaders() {

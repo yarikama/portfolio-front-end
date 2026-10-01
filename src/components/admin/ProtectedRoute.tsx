@@ -1,6 +1,5 @@
 import { Navigate, useLocation } from 'react-router-dom'
 import { authService } from '../../services/api'
-import { Loader2 } from 'lucide-react'
 
 interface ProtectedRouteProps {
   children: React.ReactNode

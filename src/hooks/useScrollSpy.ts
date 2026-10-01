@@ -2,13 +2,11 @@ import { useEffect, useState } from 'react'
 
 interface UseScrollSpyOptions {
   sectionIds: string[]
-  offset?: number
   rootMargin?: string
 }
 
 export function useScrollSpy({
   sectionIds,
-  offset = 0,
   rootMargin = '-20% 0px -80% 0px',
 }: UseScrollSpyOptions) {
   const [activeId, setActiveId] = useState<string | null>(null)
