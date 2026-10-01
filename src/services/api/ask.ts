@@ -12,6 +12,9 @@ export interface AnswerEnd {
   citations: Citation[]
   // The answer hit the backend's length cap and ends mid-sentence.
   truncated: boolean
+  // Send it with the next question, for the model to see this one: the API
+  // keeps a conversation's last two turns for 30 minutes.
+  conversation: string | null
 }
 
 // A passage the visitor highlighted on the site to ask about, and the path
@@ -28,6 +31,8 @@ interface AskHandlers {
   onToken: (text: string) => void
   signal?: AbortSignal
   passage?: Passage | null
+  // From the previous answer, to continue its conversation.
+  conversation?: string | null
 }
 
 /**
@@ -40,9 +45,13 @@ interface AskHandlers {
  */
 export async function askQuestion(
   question: string,
-  { onToken, signal, passage }: AskHandlers
+  { onToken, signal, passage, conversation }: AskHandlers
 ): Promise<AnswerEnd> {
-  const body = passage ? { question, quote: passage.text, page: passage.page } : { question }
+  const body = {
+    question,
+    ...(passage && { quote: passage.text, page: passage.page }),
+    ...(conversation && { conversation }),
+  }
   const response = await fetch(`${API_BASE_URL}/ask`, {
     method: 'POST',
     // Logged in as the admin: the API does not count the owner's questions
@@ -75,7 +84,12 @@ export async function askQuestion(
     for (const raw of events) {
       const { event, data } = parseEvent(raw)
       if (event === 'token') onToken(data.text)
-      else if (event === 'done') return { citations: data.citations, truncated: !!data.truncated }
+      else if (event === 'done')
+        return {
+          citations: data.citations,
+          truncated: !!data.truncated,
+          conversation: data.conversation ?? null,
+        }
       else if (event === 'error') throw new ApiRequestError(data.detail, 'STREAM_ERROR', 502)
     }
   }

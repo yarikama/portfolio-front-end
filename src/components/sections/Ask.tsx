@@ -26,8 +26,7 @@ export default function Ask() {
             language.
           </p>
           <p className="mt-3 text-sm text-zinc-faded max-w-2xl">
-            To fit on one home GPU, it has no memory: each question is answered on its own,
-            without the ones before it.
+            It remembers your last two questions for half an hour, so you can follow up.
           </p>
         </div>
 

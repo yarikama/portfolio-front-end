@@ -142,7 +142,7 @@ interface AskChatProps {
  * floating chat both render one, over the same conversation (AskProvider).
  */
 export default function AskChat({ className = '', compact = false, autoFocus = false }: AskChatProps) {
-  const { turns, ask, stop, isStreaming, passage, setPassage } = useAskChat()
+  const { turns, ask, stop, reset, isStreaming, passage, setPassage } = useAskChat()
   const [question, setQuestion] = useState('')
   const log = useRef<HTMLDivElement>(null)
   const input = useRef<HTMLTextAreaElement>(null)
@@ -292,9 +292,22 @@ export default function AskChat({ className = '', compact = false, autoFocus = f
       </div>
       {(turns.length > 0 || question.length > MAX_QUESTION - 100) && (
         <div className="max-w-3xl mx-auto mt-1.5 px-2 flex justify-between gap-4 text-xs text-zinc-faded">
-          {/* Once there is a conversation, follow-ups are what this is for:
-              the model sees only the question it is answering. */}
-          <p>{turns.length > 0 && 'No memory between questions: name the topic again in a follow-up.'}</p>
+          {/* The model sees the last two turns: say so, and offer a way out
+              when the visitor moves on to something else. */}
+          {turns.length > 0 ? (
+            <p>
+              Remembers your last two questions for 30 minutes.{' '}
+              <button
+                type="button"
+                onClick={reset}
+                className="underline underline-offset-2 hover:text-sage transition-colors"
+              >
+                Start over
+              </button>
+            </p>
+          ) : (
+            <p />
+          )}
           {question.length > MAX_QUESTION - 100 && (
             <p className="shrink-0 font-mono">
               {question.length}/{MAX_QUESTION}

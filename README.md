@@ -10,7 +10,7 @@ Built with React 19, TypeScript, Vite and Tailwind CSS v4, and deployed on Verce
 
 **For visitors**
 
-- **Ask about my work.** Visitors ask a question in any language. The answer streams in token by token, with numbered citations that link to the project card, note or resume behind each claim.
+- **Ask about my work.** Visitors ask a question in any language. The answer streams in token by token, with numbered citations that link to the project card, note or resume behind each claim. Follow-ups work: the model sees the last two questions and answers of the conversation.
 - **Select to ask.** Highlighting any passage on the site shows an "Ask AI" button that sends the passage along with the question.
 - **Works.** Projects filtered by category. Each card has a stable anchor (`/works#slug`) that citations link to.
 - **Notes.** Markdown notes with GitHub-flavored tables, KaTeX math and syntax highlighting, filterable by tag.

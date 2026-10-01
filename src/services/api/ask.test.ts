@@ -51,7 +51,7 @@ describe('askQuestion', () => {
     const end = await askQuestion('What is PAPIT?', { onToken: (t) => tokens.push(t) })
 
     expect(tokens).toEqual(['He built ', 'PAPIT [P1].'])
-    expect(end).toEqual({ citations: [{ id: 'P1' }], truncated: false })
+    expect(end).toEqual({ citations: [{ id: 'P1' }], truncated: false, conversation: null })
   })
 
   it('puts back together events split across network chunks', async () => {
@@ -115,6 +115,26 @@ describe('askQuestion', () => {
       quote: 'The KV cache.',
       page: '/notes/kv',
     })
+  })
+
+  it('continues a conversation with the id the last answer gave', async () => {
+    const fetch = serve(
+      stream(event('done', { citations: [], truncated: false, conversation: 'abc_DEF-123' }))
+    )
+
+    const end = await askQuestion('And then?', { onToken: () => {}, conversation: 'abc_DEF-123' })
+
+    expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual({
+      question: 'And then?',
+      conversation: 'abc_DEF-123',
+    })
+    expect(end.conversation).toBe('abc_DEF-123')
+  })
+
+  it('sends only the question when there is no passage or conversation', async () => {
+    const fetch = serve(stream(event('done', { citations: [], truncated: false })))
+    await askQuestion('Hi?', { onToken: () => {}, conversation: null })
+    expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual({ question: 'Hi?' })
   })
 
   it('sends the admin token only while it is valid', async () => {
