@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
-import { FileText, FolderKanban, Tags, LogOut } from 'lucide-react'
+import { FileText, FolderKanban, Tags, MessageSquare, LogOut } from 'lucide-react'
 import ThemeToggle from '../ui/ThemeToggle'
 
 // Operations dashboards for the home cluster. Both sit behind Cloudflare
@@ -86,6 +86,22 @@ export default function AdminNav() {
               >
                 <Tags size={14} />
                 Categories
+              </Link>
+              <Link
+                to="/admin/questions"
+                className={`
+                  inline-flex items-center gap-2 px-4 py-2
+                  font-mono text-xs uppercase tracking-widest
+                  transition-colors rounded
+                  ${
+                    isActive('/admin/questions')
+                      ? 'bg-zinc-100 dark:bg-zinc-800 text-ink dark:text-white'
+                      : 'text-zinc-500 hover:text-ink dark:hover:text-white'
+                  }
+                `}
+              >
+                <MessageSquare size={14} />
+                Questions
               </Link>
             </div>
           </div>
