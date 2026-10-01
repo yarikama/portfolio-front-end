@@ -1,21 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.png" />
     <link rel="alternate icon" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f8f7f4" />
+    <meta name="theme-color" content="#0f0f0f" />
 
-    <!-- Apply the saved or system theme before first paint, so dark mode never flashes light.
+    <!-- Dark unless the visitor chose light, applied before first paint so it never flashes.
          src/lib/theme.ts takes over once React loads. -->
     <script>
       (function () {
         try {
           var saved = localStorage.getItem('theme')
-          var dark = saved
-            ? saved === 'dark'
-            : window.matchMedia('(prefers-color-scheme: dark)').matches
+          var dark = saved !== 'light'
           document.documentElement.classList.toggle('dark', dark)
           document
             .querySelector('meta[name="theme-color"]')

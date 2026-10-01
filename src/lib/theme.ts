@@ -1,8 +1,8 @@
 import { useSyncExternalStore } from 'react'
 
-// The initial theme is applied by an inline script in index.html before React
-// loads, so dark-mode visitors never see a light flash. This module only reads
-// and changes it afterwards.
+// The initial theme (dark unless the visitor chose light) is applied by an
+// inline script in index.html before React loads, so it never flashes. This
+// module only reads and changes it afterwards.
 
 const THEME_COLORS = { light: '#f8f7f4', dark: '#0f0f0f' } as const
 const listeners = new Set<() => void>()
