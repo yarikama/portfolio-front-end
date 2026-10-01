@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Container from '../layout/Container'
-import DataStream from '../ui/DataStream'
 import HeroPhoto from '../ui/HeroPhoto'
 import FlipText from '../ui/FlipText'
-import GeometricDecor from '../ui/GeometricDecor'
 
 const BAR_MAX_HEIGHT = 22
 
@@ -57,11 +55,6 @@ export default function Hero() {
 
   return (
     <section className="min-h-dvh flex items-center relative overflow-hidden">
-      <GeometricDecor />
-      <DataStream text="GenAI + Infrastructure / Rice M.C.S. / 2026" position="left" />
-      <DataStream text="Open Source Contributor" position="right" />
-
-
       <Container>
         <div className="py-32 md:py-40 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left: Text content */}
