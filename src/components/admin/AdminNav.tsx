@@ -114,7 +114,10 @@ export default function AdminNav() {
   // The padding on top bridges the gap, so the pointer can travel from the
   // label into the panel, and it closes after a short delay rather than as
   // soon as the pointer slips off.
-  const renderGroup = (group: Group) => {
+  const renderGroup = (group: Group, index: number) => {
+    // The last menu opens leftward on a phone, so it stays on the screen.
+    const align = index === GROUPS.length - 1 ? 'right-0 sm:right-auto sm:left-0' : 'left-0'
+
     const active = group.children.some(isActive)
     return (
       <li key={group.label} className="group relative">
@@ -141,11 +144,11 @@ export default function AdminNav() {
           />
         </Link>
         <div
-          className="absolute left-0 top-full pt-2 z-50
+          className={`absolute ${align} top-full pt-2 z-50
             invisible opacity-0 translate-y-1 delay-150
             group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-hover:delay-0
             group-focus-within:visible group-focus-within:opacity-100 group-focus-within:translate-y-0 group-focus-within:delay-0
-            transition-[opacity,translate,visibility] duration-150 motion-reduce:transition-none"
+            transition-[opacity,translate,visibility] duration-150 motion-reduce:transition-none`}
         >
           <ul
             aria-label={group.label}
@@ -180,6 +183,24 @@ export default function AdminNav() {
             </a>
 
             <ul className="order-last -ml-4 flex basis-full items-center gap-1 sm:order-none sm:ml-0 sm:basis-auto">
+              {/* Back to the welcome page. */}
+              <li>
+                <Link
+                  to="/admin"
+                  aria-current={location.pathname === '/admin' ? 'page' : undefined}
+                  className={`
+                    inline-flex items-center gap-1.5 px-4 py-2 rounded
+                    font-mono text-xs uppercase tracking-widest transition-colors
+                    ${
+                      location.pathname === '/admin'
+                        ? 'bg-zinc-100 dark:bg-zinc-800 text-ink dark:text-white'
+                        : 'text-zinc-500 hover:text-ink dark:hover:text-white'
+                    }
+                  `}
+                >
+                  Desk
+                </Link>
+              </li>
               {GROUPS.map(renderGroup)}
             </ul>
           </div>

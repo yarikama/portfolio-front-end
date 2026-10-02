@@ -17,7 +17,8 @@ function useCount(fetch: () => Promise<number>, event: string): number | null {
     let live = true
     const refresh = () => {
       fetch()
-        .then((n) => live && setCount(n))
+        // Anything but a number (an unexpected answer) counts as unknown.
+        .then((n) => live && setCount(typeof n === 'number' ? n : null))
         .catch(() => live && setCount(null))
     }
     refresh()

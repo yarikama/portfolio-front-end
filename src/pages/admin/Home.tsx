@@ -4,6 +4,8 @@ import { ArrowRight, FilePen, Inbox, MessageSquare } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import AdminNav from '../../components/admin/AdminNav'
 import CoffeeCup from '../../components/admin/CoffeeCup'
+import CurrentGoal from '../../components/admin/CurrentGoal'
+import DayCountdown from '../../components/admin/DayCountdown'
 import ContributionHeatmap from '../../components/admin/ContributionHeatmap'
 import TodayList from '../../components/admin/TodayList'
 import { PROMPTS, THOUGHTS, forToday, greeting } from '../../data/adminDesk'
@@ -129,12 +131,22 @@ export default function AdminHome() {
           </div>
         </div>
 
-        <div className="mt-20 grid gap-12 md:grid-cols-2">
+        <section className="mt-20">
+          <p className="font-mono text-xs text-zinc-400 uppercase tracking-widest">Current goal</p>
+          <div className="mt-3">
+            <CurrentGoal />
+          </div>
+        </section>
+
+        <div className="mt-16 grid gap-12 md:grid-cols-2">
           <section>
             <p className="font-mono text-xs text-zinc-400 uppercase tracking-widest">Today</p>
-            <p className="mt-2 font-serif text-2xl" lang="zh-Hant">
-              今日事今日畢
-            </p>
+            <div className="mt-2 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+              <p className="font-serif text-2xl" lang="zh-Hant">
+                今日事今日畢
+              </p>
+              <DayCountdown />
+            </div>
             <div className="mt-5">
               <TodayList date={day} />
             </div>
