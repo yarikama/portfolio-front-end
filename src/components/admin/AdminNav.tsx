@@ -1,14 +1,60 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import type { LucideIcon } from 'lucide-react'
+import {
+  ArrowUpRight,
+  ChevronDown,
+  FileText,
+  FolderKanban,
+  Gauge,
+  GitBranch,
+  LogOut,
+  MessageSquare,
+  Tags,
+  UserRound,
+} from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
-import { FileText, FolderKanban, Tags, MessageSquare, LogOut, UserRound } from 'lucide-react'
 import ThemeToggle from '../ui/ThemeToggle'
 
-// Operations dashboards for the home cluster. Both sit behind Cloudflare
-// Access, so a visitor who finds these links only reaches a login page.
-const OPS_LINKS = [
-  { label: 'Grafana', href: 'https://grafana.yarikama.com' },
-  { label: 'Argo CD', href: 'https://argocd.yarikama.com' },
+interface SubItem {
+  label: string
+  href: string
+  icon: LucideIcon
+  // Another site, opened in a new tab.
+  external?: boolean
+}
+
+interface Group {
+  label: string
+  // Where the group's own label goes: its most used page.
+  href: string
+  children: SubItem[]
+}
+
+const GROUPS: Group[] = [
+  {
+    label: 'Archives',
+    href: '/admin/notes',
+    children: [
+      { label: 'Notes', href: '/admin/notes', icon: FileText },
+      { label: 'Projects', href: '/admin/projects', icon: FolderKanban },
+      { label: 'Categories', href: '/admin/categories', icon: Tags },
+    ],
+  },
+  {
+    label: 'Monitoring',
+    href: '/admin/questions',
+    children: [
+      { label: 'Questions', href: '/admin/questions', icon: MessageSquare },
+      // Dashboards for the home cluster. Both sit behind Cloudflare Access,
+      // so a visitor who finds these links only reaches a login page.
+      { label: 'Grafana', href: 'https://grafana.yarikama.com', icon: Gauge, external: true },
+      { label: 'Argo CD', href: 'https://argocd.yarikama.com', icon: GitBranch, external: true },
+    ],
+  },
 ]
+
+const SUB_LINK = `flex items-center gap-3 px-4 py-2.5 font-mono text-xs uppercase tracking-widest
+  transition-colors hover:bg-paper-dark focus-visible:bg-paper-dark`
 
 export default function AdminNav() {
   const location = useLocation()
@@ -20,15 +66,83 @@ export default function AdminNav() {
     navigate('/admin/login')
   }
 
-  const isActive = (path: string) => {
-    return location.pathname.startsWith(path)
+  const isActive = (sub: SubItem) => !sub.external && location.pathname.startsWith(sub.href)
+
+  const renderSubLink = (sub: SubItem) => {
+    const className = `${SUB_LINK} ${
+      isActive(sub) ? 'text-ink dark:text-white' : 'text-zinc-500 hover:text-ink dark:hover:text-white'
+    }`
+    const content = (
+      <>
+        <sub.icon aria-hidden="true" className="w-4 h-4 shrink-0" />
+        {sub.label}
+        {sub.external && <ArrowUpRight aria-hidden="true" className="w-3 h-3 ml-auto" />}
+      </>
+    )
+    if (sub.external) {
+      return (
+        <a href={sub.href} target="_blank" rel="noopener noreferrer" className={className}>
+          {content}
+        </a>
+      )
+    }
+    return (
+      <Link to={sub.href} aria-current={isActive(sub) ? 'page' : undefined} className={className}>
+        {content}
+      </Link>
+    )
+  }
+
+  // Hover or keyboard focus opens it (CSS only), as in the site's header.
+  // The padding on top bridges the gap, so the pointer can travel from the
+  // label into the panel, and it closes after a short delay rather than as
+  // soon as the pointer slips off.
+  const renderGroup = (group: Group) => {
+    const active = group.children.some(isActive)
+    return (
+      <li key={group.label} className="group relative">
+        <Link
+          to={group.href}
+          className={`
+            inline-flex items-center gap-1.5 px-4 py-2 rounded
+            font-mono text-xs uppercase tracking-widest transition-colors
+            ${
+              active
+                ? 'bg-zinc-100 dark:bg-zinc-800 text-ink dark:text-white'
+                : 'text-zinc-500 hover:text-ink dark:hover:text-white'
+            }
+          `}
+        >
+          {group.label}
+          <ChevronDown
+            aria-hidden="true"
+            className="w-3 h-3 transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180 motion-reduce:transition-none"
+          />
+        </Link>
+        <div
+          className="absolute left-0 top-full pt-2 z-50
+            invisible opacity-0 translate-y-1 delay-150
+            group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-hover:delay-0
+            group-focus-within:visible group-focus-within:opacity-100 group-focus-within:translate-y-0 group-focus-within:delay-0
+            transition-[opacity,translate,visibility] duration-150 motion-reduce:transition-none"
+        >
+          <ul
+            aria-label={group.label}
+            className="min-w-48 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-paper shadow-lg"
+          >
+            {group.children.map((sub) => (
+              <li key={sub.label}>{renderSubLink(sub)}</li>
+            ))}
+          </ul>
+        </div>
+      </li>
+    )
   }
 
   return (
     <nav className="border-b border-zinc-200 dark:border-zinc-800 bg-paper dark:bg-[#0f0f0f]">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between h-16">
-          {/* Logo / Brand */}
           <div className="flex items-center gap-8">
             {/* The site's own mark, opening the site in a new tab so the
                 editor stays open here. */}
@@ -42,93 +156,14 @@ export default function AdminNav() {
               &lt;H,H&gt;
             </a>
 
-            {/* Nav Links */}
-            <div className="flex items-center gap-1">
-              <Link
-                to="/admin/notes"
-                className={`
-                  inline-flex items-center gap-2 px-4 py-2
-                  font-mono text-xs uppercase tracking-widest
-                  transition-colors rounded
-                  ${
-                    isActive('/admin/notes')
-                      ? 'bg-zinc-100 dark:bg-zinc-800 text-ink dark:text-white'
-                      : 'text-zinc-500 hover:text-ink dark:hover:text-white'
-                  }
-                `}
-              >
-                <FileText size={14} />
-                Notes
-              </Link>
-              <Link
-                to="/admin/projects"
-                className={`
-                  inline-flex items-center gap-2 px-4 py-2
-                  font-mono text-xs uppercase tracking-widest
-                  transition-colors rounded
-                  ${
-                    isActive('/admin/projects')
-                      ? 'bg-zinc-100 dark:bg-zinc-800 text-ink dark:text-white'
-                      : 'text-zinc-500 hover:text-ink dark:hover:text-white'
-                  }
-                `}
-              >
-                <FolderKanban size={14} />
-                Projects
-              </Link>
-              <Link
-                to="/admin/categories"
-                className={`
-                  inline-flex items-center gap-2 px-4 py-2
-                  font-mono text-xs uppercase tracking-widest
-                  transition-colors rounded
-                  ${
-                    isActive('/admin/categories')
-                      ? 'bg-zinc-100 dark:bg-zinc-800 text-ink dark:text-white'
-                      : 'text-zinc-500 hover:text-ink dark:hover:text-white'
-                  }
-                `}
-              >
-                <Tags size={14} />
-                Categories
-              </Link>
-              <Link
-                to="/admin/questions"
-                className={`
-                  inline-flex items-center gap-2 px-4 py-2
-                  font-mono text-xs uppercase tracking-widest
-                  transition-colors rounded
-                  ${
-                    isActive('/admin/questions')
-                      ? 'bg-zinc-100 dark:bg-zinc-800 text-ink dark:text-white'
-                      : 'text-zinc-500 hover:text-ink dark:hover:text-white'
-                  }
-                `}
-              >
-                <MessageSquare size={14} />
-                Questions
-              </Link>
-            </div>
+            <ul className="flex items-center gap-1">{GROUPS.map(renderGroup)}</ul>
           </div>
 
-          {/* Actions */}
           <div className="flex items-center gap-4">
-            {OPS_LINKS.map(({ label, href }) => (
-              <a
-                key={href}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-mono text-xs uppercase tracking-widest text-zinc-400 hover:text-ink dark:hover:text-white transition-colors"
-              >
-                {label}
-              </a>
-            ))}
-            <span className="text-zinc-300 dark:text-zinc-600">|</span>
             {user && (
               <span
                 title={`Signed in as ${user.email}`}
-                className="hidden lg:inline-flex items-center gap-1.5 max-w-[16rem] font-mono text-xs text-zinc-400"
+                className="hidden md:inline-flex items-center gap-1.5 max-w-[16rem] font-mono text-xs text-zinc-400"
               >
                 <UserRound size={14} className="shrink-0" />
                 <span className="truncate">{user.email}</span>
