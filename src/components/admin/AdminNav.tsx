@@ -14,7 +14,7 @@ import {
   UserRound,
 } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
-import { useUnreadMessages } from '../../hooks/useUnreadMessages'
+import { useNewQuestions, useUnreadMessages } from '../../hooks/useUnreadMessages'
 import ThemeToggle from '../ui/ThemeToggle'
 
 interface SubItem {
@@ -23,8 +23,9 @@ interface SubItem {
   icon: LucideIcon
   // Another site, opened in a new tab.
   external?: boolean
-  // Shows how many contact messages are unread.
-  unread?: boolean
+  // Shows a count: contact messages not opened yet, or visitors'
+  // questions since Questions was last opened.
+  count?: 'unread' | 'new'
 }
 
 interface Group {
@@ -48,8 +49,8 @@ const GROUPS: Group[] = [
     label: 'Monitoring',
     href: '/admin/messages',
     children: [
-      { label: 'Messages', href: '/admin/messages', icon: Inbox, unread: true },
-      { label: 'Questions', href: '/admin/questions', icon: MessageSquare },
+      { label: 'Messages', href: '/admin/messages', icon: Inbox, count: 'unread' },
+      { label: 'Questions', href: '/admin/questions', icon: MessageSquare, count: 'new' },
       // Dashboards for the home cluster. Both sit behind Cloudflare Access,
       // so a visitor who finds these links only reaches a login page.
       { label: 'Grafana', href: 'https://grafana.yarikama.com', icon: Gauge, external: true },
@@ -65,14 +66,14 @@ export default function AdminNav() {
   const location = useLocation()
   const navigate = useNavigate()
   const { user, logout } = useAuth()
-  const unread = useUnreadMessages()
-  const unreadBadge = (className = '') =>
-    unread ? (
+  const counts = { unread: useUnreadMessages() ?? 0, new: useNewQuestions() ?? 0 }
+  const badge = (n: number, label: string, className = '') =>
+    n > 0 ? (
       <span
-        aria-label={`${unread} unread`}
+        aria-label={`${n} ${label}`}
         className={`min-w-5 rounded-full bg-sage px-1.5 text-center font-mono text-[0.625rem] leading-5 text-paper ${className}`}
       >
-        {unread}
+        {n}
       </span>
     ) : null
 
@@ -91,7 +92,7 @@ export default function AdminNav() {
       <>
         <sub.icon aria-hidden="true" className="w-4 h-4 shrink-0" />
         {sub.label}
-        {sub.unread && unreadBadge('ml-auto')}
+        {sub.count && badge(counts[sub.count], sub.count, 'ml-auto')}
         {sub.external && <ArrowUpRight aria-hidden="true" className="w-3 h-3 ml-auto" />}
       </>
     )
@@ -130,7 +131,10 @@ export default function AdminNav() {
           `}
         >
           {group.label}
-          {group.children.some((sub) => sub.unread) && unreadBadge()}
+          {badge(
+            group.children.reduce((sum, sub) => sum + (sub.count ? counts[sub.count] : 0), 0),
+            'new or unread',
+          )}
           <ChevronDown
             aria-hidden="true"
             className="w-3 h-3 transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180 motion-reduce:transition-none"
