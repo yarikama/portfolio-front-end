@@ -17,6 +17,7 @@ import NotesPage from './pages/NotesPage'
 // barrels, or the barrel's static re-exports pull them back into the main chunk.
 const NotePage = lazy(() => import('./pages/NotePage'))
 const AdminLogin = lazy(() => import('./pages/admin/Login'))
+const AdminHome = lazy(() => import('./pages/admin/Home'))
 const AdminNotesList = lazy(() => import('./pages/admin/NotesList'))
 const AdminNoteEditor = lazy(() => import('./pages/admin/NoteEditor'))
 const AdminProjectsList = lazy(() => import('./pages/admin/ProjectsList'))
@@ -24,6 +25,7 @@ const AdminProjectEditor = lazy(() => import('./pages/admin/ProjectEditor'))
 const AdminCategoriesList = lazy(() => import('./pages/admin/CategoriesList'))
 const AdminCategoryEditor = lazy(() => import('./pages/admin/CategoryEditor'))
 const AdminQuestionsList = lazy(() => import('./pages/admin/QuestionsList'))
+const AdminMessagesList = lazy(() => import('./pages/admin/MessagesList'))
 
 function App() {
   return (
@@ -36,7 +38,7 @@ function App() {
             path="/admin"
             element={
               <ProtectedRoute>
-                <AdminNotesList />
+                <AdminHome />
               </ProtectedRoute>
             }
           />
@@ -118,6 +120,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <AdminQuestionsList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/messages"
+            element={
+              <ProtectedRoute>
+                <AdminMessagesList />
               </ProtectedRoute>
             }
           />

@@ -31,7 +31,31 @@ export interface QuestionFilters {
   rating?: Rating | 'none'
 }
 
+// Lets the nav's count of new questions follow a visit to Questions.
+export const QUESTIONS_SEEN = 'admin:questions-seen'
+
 export const adminAskQuestionsService = {
+  /** Visitors' questions since this account last opened Questions. */
+  async newCount(): Promise<number> {
+    const { data } = await authFetch<{ data: { count: number } }>(
+      `${API_BASE_URL}/admin/ask/questions/new`,
+    )
+    return data.count
+  },
+
+  /**
+   * Records a visit to Questions. Returns when the previous one was (null
+   * if never): questions asked after it are new.
+   */
+  async markSeen(): Promise<string | null> {
+    const { data } = await authFetch<{ data: { previous: string | null } }>(
+      `${API_BASE_URL}/admin/ask/questions/seen`,
+      { method: 'POST' },
+    )
+    window.dispatchEvent(new Event(QUESTIONS_SEEN))
+    return data.previous
+  },
+
   async list(
     filters: QuestionFilters,
     offset = 0,

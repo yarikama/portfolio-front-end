@@ -1,0 +1,50 @@
+import { authFetch } from './adminLabNotes'
+import type { ApiResponse } from '../../types'
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.yarikama.com/api/v1'
+
+export interface Todo {
+  id: string
+  text: string
+  href: string | null
+  day: string // YYYY-MM-DD: the day it was for
+  dailyKey: string | null // set on the items added every day
+  doneOn: string | null
+  createdAt: string
+}
+
+/** A date as YYYY-MM-DD in the browser's own time zone: the owner's today. */
+export function localDay(date: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+}
+
+export const adminTodosService = {
+  /** The day's list: what carried over first, then the day's own. */
+  async list(day: string): Promise<Todo[]> {
+    const { data } = await authFetch<{ data: Todo[] }>(
+      `${API_BASE_URL}/admin/todos?${new URLSearchParams({ day })}`,
+    )
+    return data
+  },
+
+  async add(text: string, day: string): Promise<Todo> {
+    const { data } = await authFetch<ApiResponse<Todo>>(`${API_BASE_URL}/admin/todos`, {
+      method: 'POST',
+      body: JSON.stringify({ text, day }),
+    })
+    return data
+  },
+
+  async tick(id: string, done: boolean, day: string): Promise<Todo> {
+    const { data } = await authFetch<ApiResponse<Todo>>(`${API_BASE_URL}/admin/todos/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ done, day }),
+    })
+    return data
+  },
+
+  async remove(id: string): Promise<void> {
+    await authFetch<void>(`${API_BASE_URL}/admin/todos/${id}`, { method: 'DELETE' })
+  },
+}

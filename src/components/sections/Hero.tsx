@@ -84,7 +84,7 @@ export default function Hero() {
               </p>
 
               <p className="mt-4 text-lg text-zinc-faded leading-relaxed">
-                Software engineer across GenAI and backend{'\u2014'}from RAG architectures and
+                Software engineer across GenAI and backend, from RAG architectures and
                 agentic workflows to the pipelines and test infrastructure that keep them running.
               </p>
             </div>

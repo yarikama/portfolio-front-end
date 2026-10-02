@@ -9,3 +9,4 @@ export { useMediaQuery, usePrefersReducedMotion, useFinePointer } from './useMed
 export { useAsk } from './useAsk'
 export type { Turn } from './useAsk'
 export { useAskChat } from './useAskChat'
+export { useUnreadMessages, useNewQuestions } from './useUnreadMessages'

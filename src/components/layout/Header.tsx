@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import type { LucideIcon } from 'lucide-react'
 import { ChevronDown, FileText, Github, Linkedin, Mail, MessageSquare } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 import Container from './Container'
 import ThemeToggle from '../ui/ThemeToggle'
 import { useScrollSpy } from '../../hooks/useScrollSpy'
+import { hasAdminHint } from '../../services/api/auth'
 
 interface SubItem {
   label: string
@@ -69,6 +70,10 @@ function scrollToSection(hash: string) {
   }
 }
 
+// Only in a browser where the admin has signed in (services/api/auth.ts):
+// visitors never see it.
+const ADMIN_ITEM: NavItem = { label: 'Admin', href: '/admin', isRoute: true }
+
 const sectionIds = navItems
   .filter((item) => item.sectionId)
   .map((item) => item.sectionId as string)
@@ -79,6 +84,7 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const location = useLocation()
   const isHomePage = location.pathname === '/'
+  const items = useMemo(() => (hasAdminHint() ? [...navItems, ADMIN_ITEM] : navItems), [])
   // The header stays mounted across pages: switching the list when the home
   // page comes back makes the spy look up its freshly rendered sections.
   const activeSection = useScrollSpy({ sectionIds: isHomePage ? sectionIds : noSections })
@@ -237,7 +243,7 @@ export default function Header() {
           </Link>
 
           <ul className="hidden md:flex items-center gap-8">
-            {navItems.map((item) => (
+            {items.map((item) => (
               <li key={item.href} className={item.children ? 'group relative' : undefined}>
                 {renderNavLink(item)}
                 {item.children && renderDropdown(item)}
@@ -266,7 +272,7 @@ export default function Header() {
             className="md:hidden pb-6 border-t border-zinc-200 dark:border-zinc-200/20 max-h-[calc(100dvh-5rem)] overflow-y-auto overscroll-contain"
           >
             <ul className="flex flex-col gap-5 pt-6">
-              {navItems.map((item) => (
+              {items.map((item) => (
                 <li key={item.href}>
                   {renderNavLink(item)}
                   {item.children && (
