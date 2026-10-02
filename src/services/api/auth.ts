@@ -41,6 +41,27 @@ try {
 // shows up as a 401 from the next admin request.
 let session: Promise<AuthUser | null> | null = null
 
+// Left in a browser where the admin has been signed in, so the site's
+// header can show an Admin link there and nowhere else. Only a hint: the
+// admin pages still ask the API, and it grants nothing.
+const ADMIN_HINT = 'admin-hint'
+
+export function hasAdminHint(): boolean {
+  try {
+    return localStorage.getItem(ADMIN_HINT) === '1'
+  } catch {
+    return false
+  }
+}
+
+function leaveAdminHint() {
+  try {
+    localStorage.setItem(ADMIN_HINT, '1')
+  } catch {
+    // Storage blocked: no Admin link in the header, nothing else.
+  }
+}
+
 export const authService = {
   /**
    * Where "Sign in with Google" goes: the API sends the browser on to
@@ -60,10 +81,16 @@ export const authService = {
 
   /** me(), asked once per page load. */
   session(): Promise<AuthUser | null> {
-    session ??= this.me().catch((error) => {
-      session = null // ask again next time
-      throw error
-    })
+    session ??= this.me().then(
+      (user) => {
+        if (user) leaveAdminHint()
+        return user
+      },
+      (error) => {
+        session = null // ask again next time
+        throw error
+      },
+    )
     return session
   },
 

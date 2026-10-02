@@ -52,3 +52,51 @@ describe('signInErrorMessage', () => {
     expect(signInErrorMessage('something-new')).toMatch(/failed/)
   })
 })
+
+describe('the admin hint', () => {
+  function storage() {
+    const items = new Map<string, string>()
+    vi.stubGlobal('localStorage', {
+      getItem: (key: string) => items.get(key) ?? null,
+      setItem: (key: string, value: string) => items.set(key, value),
+      removeItem: (key: string) => items.delete(key),
+    })
+  }
+
+  // A fresh module each time: the session check is kept per page load.
+  async function freshAuth() {
+    vi.resetModules()
+    return import('./auth')
+  }
+
+  it('is not left for a visitor', async () => {
+    storage()
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('{}', { status: 401 })))
+    const auth = await freshAuth()
+
+    expect(await auth.authService.session()).toBeNull()
+    expect(auth.hasAdminHint()).toBe(false)
+  })
+
+  it('is left once the admin is seen signed in', async () => {
+    storage()
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(new Response(JSON.stringify({ email: 'owner@example.com' }))),
+    )
+    const auth = await freshAuth()
+
+    await auth.authService.session()
+    expect(auth.hasAdminHint()).toBe(true)
+  })
+
+  it('reads as absent when storage is blocked', async () => {
+    vi.stubGlobal('localStorage', {
+      getItem: () => {
+        throw new Error('blocked')
+      },
+    })
+    const auth = await freshAuth()
+    expect(auth.hasAdminHint()).toBe(false)
+  })
+})
