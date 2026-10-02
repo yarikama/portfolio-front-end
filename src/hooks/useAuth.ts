@@ -1,60 +1,35 @@
 import { useState, useEffect, useCallback } from 'react'
-import { authService, type LoginCredentials } from '../services/api'
+import { authService, type AuthUser } from '../services/api'
+
+type Status = 'checking' | 'signed-in' | 'signed-out' | 'error'
 
 interface UseAuthState {
-  isAuthenticated: boolean
-  isLoading: boolean
-  error: string | null
+  status: Status
+  user: AuthUser | null
 }
 
 export function useAuth() {
-  const [state, setState] = useState<UseAuthState>({
-    isAuthenticated: false,
-    isLoading: true,
-    error: null,
-  })
+  const [state, setState] = useState<UseAuthState>({ status: 'checking', user: null })
 
   useEffect(() => {
-    setState({
-      isAuthenticated: authService.isAuthenticated(),
-      isLoading: false,
-      error: null,
-    })
-  }, [])
-
-  const login = useCallback(async (credentials: LoginCredentials) => {
-    setState((prev) => ({ ...prev, isLoading: true, error: null }))
-
-    try {
-      await authService.login(credentials)
-      setState({
-        isAuthenticated: true,
-        isLoading: false,
-        error: null,
+    let live = true
+    authService
+      .session()
+      .then((user) => {
+        if (live) setState({ status: user ? 'signed-in' : 'signed-out', user })
       })
-      return true
-    } catch (error) {
-      setState({
-        isAuthenticated: false,
-        isLoading: false,
-        error: error instanceof Error ? error.message : 'Login failed',
+      .catch(() => {
+        if (live) setState({ status: 'error', user: null })
       })
-      return false
+    return () => {
+      live = false
     }
   }, [])
 
-  const logout = useCallback(() => {
-    authService.logout()
-    setState({
-      isAuthenticated: false,
-      isLoading: false,
-      error: null,
-    })
+  const logout = useCallback(async () => {
+    await authService.logout()
+    setState({ status: 'signed-out', user: null })
   }, [])
 
-  return {
-    ...state,
-    login,
-    logout,
-  }
+  return { ...state, logout }
 }

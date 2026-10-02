@@ -15,8 +15,8 @@ export default function AdminNav() {
   const navigate = useNavigate()
   const { logout } = useAuth()
 
-  const handleLogout = () => {
-    logout()
+  const handleLogout = async () => {
+    await logout()
     navigate('/admin/login')
   }
 

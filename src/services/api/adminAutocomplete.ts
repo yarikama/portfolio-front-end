@@ -1,4 +1,4 @@
-import { authService } from './auth'
+import { adminFetch } from './auth'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.yarikama.com/api/v1'
 
@@ -21,9 +21,9 @@ export const adminAutocompleteService = {
     signal: AbortSignal,
   ): Promise<Suggestion> {
     try {
-      const response = await fetch(`${API_BASE_URL}/admin/complete`, {
+      const response = await adminFetch(`${API_BASE_URL}/admin/complete`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...authService.getAuthHeaders() },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(params),
         signal,
       })
@@ -38,9 +38,9 @@ export const adminAutocompleteService = {
   // Fire and forget. keepalive lets the report finish when the editor
   // unmounts (e.g. navigating away while a suggestion is showing).
   feedback(id: string, outcome: SuggestionOutcome, acceptedChars?: number): void {
-    fetch(`${API_BASE_URL}/admin/complete/${id}/feedback`, {
+    adminFetch(`${API_BASE_URL}/admin/complete/${id}/feedback`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authService.getAuthHeaders() },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ outcome, acceptedChars }),
       keepalive: true,
     }).catch(() => {})

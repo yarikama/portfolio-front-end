@@ -1,5 +1,4 @@
 import { API_BASE_URL, ApiRequestError, apiErrorMessage } from './client'
-import { authService } from './auth'
 
 export interface Citation {
   id: string // what the answer cites: P1, N1, R1
@@ -54,12 +53,10 @@ export async function askQuestion(
   }
   const response = await fetch(`${API_BASE_URL}/ask`, {
     method: 'POST',
-    // Logged in as the admin: the API does not count the owner's questions
-    // against the visitor limits.
-    headers: {
-      'Content-Type': 'application/json',
-      ...(authService.isAuthenticated() ? authService.getAuthHeaders() : {}),
-    },
+    headers: { 'Content-Type': 'application/json' },
+    // Signed in as the admin, the session cookie comes along and the API
+    // does not count the owner's questions against the visitor limits.
+    credentials: 'include',
     body: JSON.stringify(body),
     signal,
   })
