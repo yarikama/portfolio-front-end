@@ -28,6 +28,12 @@ export const adminTodosService = {
     return data
   },
 
+  /** Past to-dos' text, most recent first: what a new one completes from. */
+  async history(): Promise<string[]> {
+    const { data } = await authFetch<{ data: string[] }>(`${API_BASE_URL}/admin/todos/history`)
+    return data
+  },
+
   async add(text: string, day: string): Promise<Todo> {
     const { data } = await authFetch<ApiResponse<Todo>>(`${API_BASE_URL}/admin/todos`, {
       method: 'POST',

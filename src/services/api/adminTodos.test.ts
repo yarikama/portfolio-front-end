@@ -27,3 +27,16 @@ describe('adminTodosService', () => {
     expect(fetch.mock.calls[1][1].credentials).toBe('include')
   })
 })
+
+describe('completing a to-do', () => {
+  it('offers the most recent past item that what is typed starts', async () => {
+    const { completion } = await import('../../lib/todos')
+    const history = ['Review the CSP reports', 'Reply to the recruiter', 'Review notes']
+
+    expect(completion('rev', history)).toBe('Review the CSP reports')
+    expect(completion('Repl', history)).toBe('Reply to the recruiter')
+    expect(completion('r', history)).toBeNull() // too short to guess
+    expect(completion('Review the CSP reports', history)).toBeNull() // nothing more to add
+    expect(completion('Write', history)).toBeNull()
+  })
+})
