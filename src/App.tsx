@@ -24,6 +24,7 @@ const AdminProjectEditor = lazy(() => import('./pages/admin/ProjectEditor'))
 const AdminCategoriesList = lazy(() => import('./pages/admin/CategoriesList'))
 const AdminCategoryEditor = lazy(() => import('./pages/admin/CategoryEditor'))
 const AdminQuestionsList = lazy(() => import('./pages/admin/QuestionsList'))
+const AdminMessagesList = lazy(() => import('./pages/admin/MessagesList'))
 
 function App() {
   return (
@@ -118,6 +119,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <AdminQuestionsList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/messages"
+            element={
+              <ProtectedRoute>
+                <AdminMessagesList />
               </ProtectedRoute>
             }
           />
