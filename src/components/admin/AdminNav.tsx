@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
-import { FileText, FolderKanban, Tags, MessageSquare, LogOut } from 'lucide-react'
+import { FileText, FolderKanban, Tags, MessageSquare, LogOut, UserRound } from 'lucide-react'
 import ThemeToggle from '../ui/ThemeToggle'
 
 // Operations dashboards for the home cluster. Both sit behind Cloudflare
@@ -13,7 +13,7 @@ const OPS_LINKS = [
 export default function AdminNav() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { logout } = useAuth()
+  const { user, logout } = useAuth()
 
   const handleLogout = async () => {
     await logout()
@@ -30,12 +30,17 @@ export default function AdminNav() {
         <div className="flex items-center justify-between h-16">
           {/* Logo / Brand */}
           <div className="flex items-center gap-8">
-            <Link
-              to="/admin"
-              className="font-serif text-xl font-light hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
+            {/* The site's own mark, opening the site in a new tab so the
+                editor stays open here. */}
+            <a
+              href="/"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="View site"
+              className="font-serif text-xl font-light tracking-tight hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
             >
-              Admin
-            </Link>
+              &lt;H,H&gt;
+            </a>
 
             {/* Nav Links */}
             <div className="flex items-center gap-1">
@@ -120,14 +125,15 @@ export default function AdminNav() {
               </a>
             ))}
             <span className="text-zinc-300 dark:text-zinc-600">|</span>
-            <a
-              href="/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-mono text-xs uppercase tracking-widest text-zinc-400 hover:text-ink dark:hover:text-white transition-colors"
-            >
-              View Site
-            </a>
+            {user && (
+              <span
+                title={`Signed in as ${user.email}`}
+                className="hidden lg:inline-flex items-center gap-1.5 max-w-[16rem] font-mono text-xs text-zinc-400"
+              >
+                <UserRound size={14} className="shrink-0" />
+                <span className="truncate">{user.email}</span>
+              </span>
+            )}
             <ThemeToggle />
             <button
               onClick={handleLogout}
