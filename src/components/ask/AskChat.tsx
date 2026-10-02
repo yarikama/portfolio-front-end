@@ -143,6 +143,9 @@ interface AskChatProps {
  */
 export default function AskChat({ className = '', compact = false, autoFocus = false }: AskChatProps) {
   const { turns, ask, stop, reset, isStreaming, passage, setPassage } = useAskChat()
+  // On the page the box opens out wide, and the conversation with it; the
+  // floating chat is narrow anyway.
+  const column = compact ? 'max-w-3xl' : 'max-w-5xl'
   const [question, setQuestion] = useState('')
   const log = useRef<HTMLDivElement>(null)
   const input = useRef<HTMLTextAreaElement>(null)
@@ -222,8 +225,9 @@ export default function AskChat({ className = '', compact = false, autoFocus = f
           </div>
         </div>
       ) : (
-        // A column of reading width, however wide the box has opened.
-        <div className="max-w-3xl mx-auto">
+        // A column of reading width (wider on the page than in the floating
+        // chat), however wide the box has opened.
+        <div className={`${column} mx-auto`}>
           {turns.map((turn) => (
             <TurnView key={turn.id} turn={turn} anchor={anchor} />
           ))}
@@ -239,7 +243,7 @@ export default function AskChat({ className = '', compact = false, autoFocus = f
       className="border-t border-zinc-200 dark:border-zinc-700 p-3"
     >
       {passage && (
-        <div className="max-w-3xl mx-auto mb-2 flex items-start gap-2 rounded-xl bg-sage/10 pl-3 pr-1 py-2">
+        <div className={`${column} mx-auto mb-2 flex items-start gap-2 rounded-xl bg-sage/10 pl-3 pr-1 py-2`}>
           <blockquote className="flex-1 border-l-2 border-sage/60 pl-3 text-sm italic text-zinc-faded line-clamp-3">
             {passage.text}
           </blockquote>
@@ -253,7 +257,7 @@ export default function AskChat({ className = '', compact = false, autoFocus = f
           </button>
         </div>
       )}
-      <div className="max-w-3xl mx-auto flex items-end gap-2 rounded-2xl border border-zinc-200 dark:border-zinc-700 focus-within:border-ink dark:focus-within:border-zinc-400 transition-colors duration-300 pl-4 pr-2 py-2">
+      <div className={`${column} mx-auto flex items-end gap-2 rounded-2xl border border-zinc-200 dark:border-zinc-700 focus-within:border-ink dark:focus-within:border-zinc-400 transition-colors duration-300 pl-4 pr-2 py-2`}>
         <label htmlFor={`${anchor}-question`} className="sr-only">
           Your question
         </label>
@@ -291,7 +295,7 @@ export default function AskChat({ className = '', compact = false, autoFocus = f
         )}
       </div>
       {(turns.length > 0 || question.length > MAX_QUESTION - 100) && (
-        <div className="max-w-3xl mx-auto mt-1.5 px-2 flex justify-between gap-4 text-xs text-zinc-faded">
+        <div className={`${column} mx-auto mt-1.5 px-2 flex justify-between gap-4 text-xs text-zinc-faded`}>
           {/* The model sees the last two turns: say so, and offer a way out
               when the visitor moves on to something else. */}
           {turns.length > 0 ? (
