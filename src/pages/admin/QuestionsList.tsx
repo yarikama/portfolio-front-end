@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Loader2, ThumbsDown, ThumbsUp } from 'lucide-react'
 import AdminNav from '../../components/admin/AdminNav'
@@ -43,9 +43,11 @@ function chip(active: boolean) {
 
 function QuestionCard({
   item,
+  isNew,
   onRate,
 }: {
   item: AskedQuestion
+  isNew: boolean
   onRate: (rating: Rating | null) => void
 }) {
   const [open, setOpen] = useState(false)
@@ -59,10 +61,16 @@ function QuestionCard({
   }
 
   return (
-    <article className="border border-zinc-200 dark:border-zinc-800 p-5">
+    <article className={`border p-5 ${isNew ? 'border-sage/60' : 'border-zinc-200 dark:border-zinc-800'}`}>
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-zinc-400">
+            {isNew && (
+              <span className="inline-flex items-center gap-1.5 text-sage">
+                <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-sage" />
+                New
+              </span>
+            )}
             <time dateTime={item.createdAt}>
               {when.toLocaleDateString()} {when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </time>
@@ -169,6 +177,26 @@ export default function AdminQuestionsList() {
   const [total, setTotal] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  // When Questions was opened before this visit: visitors' questions after
+  // it are marked new. undefined until known (or if it can't be recorded).
+  const [previousVisit, setPreviousVisit] = useState<string | null>()
+  const recorded = useRef(false)
+
+  useEffect(() => {
+    // Once per visit: a second record (React runs effects twice in
+    // development) would make this very visit the previous one.
+    if (recorded.current) return
+    recorded.current = true
+    adminAskQuestionsService
+      .markSeen()
+      .then(setPreviousVisit)
+      .catch(() => {})
+  }, [])
+
+  const isNew = (item: AskedQuestion) =>
+    previousVisit !== undefined &&
+    !item.admin &&
+    (previousVisit === null || new Date(item.createdAt) > new Date(previousVisit))
 
   const load = useCallback(
     async (offset: number) => {
@@ -210,6 +238,15 @@ export default function AdminQuestionsList() {
           <p className="text-sm text-zinc-faded">
             What was asked in the chat, kept for 30 days. Rate answers to build the evaluation set.
           </p>
+          {previousVisit && (
+            <p className="mt-1 font-mono text-xs text-sage">
+              New since your last visit,{' '}
+              {new Date(previousVisit).toLocaleString([], {
+                dateStyle: 'medium',
+                timeStyle: 'short',
+              })}
+            </p>
+          )}
         </div>
       </header>
 
@@ -271,7 +308,12 @@ export default function AdminQuestionsList() {
         ) : (
           <div className="space-y-4">
             {items.map((item) => (
-              <QuestionCard key={item.id} item={item} onRate={(rating) => rate(item.id, rating)} />
+              <QuestionCard
+                key={item.id}
+                item={item}
+                isNew={isNew(item)}
+                onRate={(rating) => rate(item.id, rating)}
+              />
             ))}
           </div>
         )}
