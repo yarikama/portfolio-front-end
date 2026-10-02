@@ -35,6 +35,7 @@ const honors: { title: string; detail: string; rank: string; url?: string }[] = 
     title: '23rd Golden Peak Award',
     detail: 'Outstanding Commercial Product, MaiAgent AI Platform',
     rank: '2025',
+    url: 'https://lifenews.com.tw/334346',
   },
   {
     title: 'Atona Case Competition Finalist',

@@ -97,7 +97,7 @@ export default function Hero() {
               `}
             >
               <a
-                href="https://presidential-hackathon.taiwan.gov.tw/teams.html"
+                href="https://english.president.gov.tw/News/6881"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group flex items-stretch border border-sage/40 hover:border-sage transition-colors duration-300"
@@ -112,7 +112,7 @@ export default function Hero() {
                 </span>
               </a>
               <a
-                href="https://money.udn.com/money/story/5635/8729582"
+                href="https://lifenews.com.tw/334346"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group flex items-stretch border border-zinc-200 dark:border-zinc-200/30 hover:border-sage transition-colors duration-300"
