@@ -5,7 +5,9 @@ import { adminGithubService, type ContributionDay, type Contributions } from '..
 // The owner's GitHub contribution graph, as on the profile page: a column
 // per week, Sunday at the top, shaded by GitHub's own 0-4 levels in sage.
 
-const SHADES = ['bg-zinc-200', 'bg-sage/25', 'bg-sage/50', 'bg-sage/75', 'bg-sage']
+// No contributions darker in the dark theme than the zinc-200 it remaps
+// to, so the faintest green stands apart from it.
+const SHADES = ['bg-zinc-200 dark:bg-[#1c1c1e]', 'bg-sage/30', 'bg-sage/55', 'bg-sage/80', 'bg-sage']
 const MONTH = new Intl.DateTimeFormat('en-US', {
   month: 'short',
   timeZone: 'UTC',
