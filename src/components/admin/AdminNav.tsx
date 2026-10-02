@@ -186,13 +186,15 @@ export default function AdminNav() {
 
           <div className="flex items-center gap-4">
             {user && (
-              <span
-                title={`Signed in as ${user.email}`}
-                className="hidden md:inline-flex items-center gap-1.5 max-w-[16rem] font-mono text-xs text-zinc-400"
+              // Back to the welcome page, the admin's desk.
+              <Link
+                to="/admin"
+                title={`Signed in as ${user.email}. Back to your desk`}
+                className="hidden md:inline-flex items-center gap-1.5 max-w-[16rem] font-mono text-xs text-zinc-400 hover:text-ink transition-colors"
               >
                 <UserRound size={14} className="shrink-0" />
                 <span className="truncate">{user.email}</span>
-              </span>
+              </Link>
             )}
             <ThemeToggle />
             <button

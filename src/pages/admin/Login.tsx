@@ -8,7 +8,7 @@ export default function AdminLogin() {
   // Set by the API when sign-in did not succeed.
   const error = signInErrorMessage(params.get('error'))
 
-  const from = (location.state as { from?: Location })?.from?.pathname || '/admin/notes'
+  const from = (location.state as { from?: Location })?.from?.pathname || '/admin'
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-paper dark:bg-[#0f0f0f] px-4 relative">
