@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, FilePen, Inbox, MessageSquare } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import AdminNav from '../../components/admin/AdminNav'
 import CoffeeCup from '../../components/admin/CoffeeCup'
+import ContributionHeatmap from '../../components/admin/ContributionHeatmap'
+import TodayList from '../../components/admin/TodayList'
 import { PROMPTS, THOUGHTS, forToday, greeting } from '../../data/adminDesk'
 import { useNewQuestions, useUnreadMessages } from '../../hooks'
 import { adminLabNotesService } from '../../services/api'
@@ -74,6 +76,9 @@ export default function AdminHome() {
   const unread = useUnreadMessages()
   const newQuestions = useNewQuestions()
   const drafts = useDrafts()
+  // Changes once a day, so the routine reloads only then.
+  const dayKey = now.toDateString()
+  const day = useMemo(() => new Date(dayKey), [dayKey])
   const time = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
 
   return (
@@ -124,33 +129,49 @@ export default function AdminHome() {
           </div>
         </div>
 
-        <section className="mt-20">
-          <p className="font-mono text-xs text-zinc-400 uppercase tracking-widest">Waiting for you</p>
-          <div className="mt-4 grid gap-3 md:grid-cols-3">
-            <Waiting
-              to="/admin/messages"
-              icon={Inbox}
-              count={unread}
-              one="1 unread message"
-              many="{n} unread messages"
-              none="No unread messages"
-            />
-            <Waiting
-              to="/admin/questions"
-              icon={MessageSquare}
-              count={newQuestions}
-              one="1 new question since your last look"
-              many="{n} new questions since your last look"
-              none="No new questions"
-            />
-            <Waiting
-              to="/admin/notes"
-              icon={FilePen}
-              count={drafts}
-              one="1 draft waiting to be finished"
-              many="{n} drafts waiting to be finished"
-              none="No drafts in progress"
-            />
+        <div className="mt-20 grid gap-12 md:grid-cols-2">
+          <section>
+            <p className="font-mono text-xs text-zinc-400 uppercase tracking-widest">Today</p>
+            <div className="mt-4">
+              <TodayList date={day} />
+            </div>
+          </section>
+
+          <section>
+            <p className="font-mono text-xs text-zinc-400 uppercase tracking-widest">Waiting for you</p>
+            <div className="mt-4 grid gap-3">
+              <Waiting
+                to="/admin/messages"
+                icon={Inbox}
+                count={unread}
+                one="1 unread message"
+                many="{n} unread messages"
+                none="No unread messages"
+              />
+              <Waiting
+                to="/admin/questions"
+                icon={MessageSquare}
+                count={newQuestions}
+                one="1 new question since your last look"
+                many="{n} new questions since your last look"
+                none="No new questions"
+              />
+              <Waiting
+                to="/admin/notes"
+                icon={FilePen}
+                count={drafts}
+                one="1 draft waiting to be finished"
+                many="{n} drafts waiting to be finished"
+                none="No drafts in progress"
+              />
+            </div>
+          </section>
+        </div>
+
+        <section className="mt-16">
+          <p className="font-mono text-xs text-zinc-400 uppercase tracking-widest">A year on GitHub</p>
+          <div className="mt-4">
+            <ContributionHeatmap />
           </div>
         </section>
       </main>
