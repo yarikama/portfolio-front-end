@@ -1,4 +1,4 @@
-import { authService } from './auth'
+import { adminFetch } from './auth'
 import type { ApiResponse, LabNote } from '../../types'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.yarikama.com/api/v1'
@@ -17,17 +17,16 @@ export interface CreateLabNoteData {
 export type UpdateLabNoteData = Partial<CreateLabNoteData>
 
 export async function authFetch<T>(url: string, options: RequestInit = {}): Promise<T> {
-  const response = await fetch(url, {
+  const response = await adminFetch(url, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      ...authService.getAuthHeaders(),
       ...options.headers,
     },
   })
 
+  // The session ended (expired, or signed out elsewhere).
   if (response.status === 401) {
-    authService.logout()
     window.location.href = '/admin/login'
     throw new Error('Unauthorized')
   }

@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { askQuestion } from './ask'
 import { ApiRequestError } from './client'
 
@@ -22,19 +22,6 @@ function serve(response: Response) {
   return fetch
 }
 
-// authService keeps the admin token in localStorage, which Node lacks.
-function storage(entries: Record<string, string> = {}) {
-  const items = new Map(Object.entries(entries))
-  vi.stubGlobal('localStorage', {
-    getItem: (key: string) => items.get(key) ?? null,
-    setItem: (key: string, value: string) => items.set(key, value),
-    removeItem: (key: string) => items.delete(key),
-  })
-}
-
-const token = (exp: number) => `x.${btoa(JSON.stringify({ sub: 'admin', exp }))}.y`
-
-beforeEach(() => storage())
 afterEach(() => vi.unstubAllGlobals())
 
 describe('askQuestion', () => {
@@ -137,18 +124,11 @@ describe('askQuestion', () => {
     expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual({ question: 'Hi?' })
   })
 
-  it('sends the admin token only while it is valid', async () => {
-    const now = Math.floor(Date.now() / 1000)
-    const headers = async () => {
-      const fetch = serve(stream(event('done', { citations: [], truncated: false })))
-      await askQuestion('Q?', { onToken: () => {} })
-      return fetch.mock.calls[0][1].headers
-    }
-
-    expect((await headers()).Authorization).toBeUndefined()
-    storage({ admin_token: token(now + 3600) })
-    expect((await headers()).Authorization).toBe(`Bearer ${token(now + 3600)}`)
-    storage({ admin_token: token(now - 60) })
-    expect((await headers()).Authorization).toBeUndefined()
+  it('sends the session cookie, for the admin', async () => {
+    const fetch = serve(stream(event('done', { citations: [], truncated: false })))
+    await askQuestion('Q?', { onToken: () => {} })
+    const init = fetch.mock.calls[0][1]
+    expect(init.credentials).toBe('include')
+    expect(init.headers.Authorization).toBeUndefined()
   })
 })

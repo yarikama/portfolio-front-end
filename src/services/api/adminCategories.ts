@@ -1,22 +1,14 @@
-import { authService } from './auth'
+import { adminFetch } from './auth'
 import type { ApiResponse, Category, CategoryCreate, CategoryUpdate, CategoryReorderItem } from '../../types'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.yarikama.com/api/v1'
 
 class AdminCategoriesService {
-  private getAuthHeaders() {
-    return authService.getAuthHeaders()
-  }
-
   /**
    * Get all categories (admin view)
    */
   async getAll(): Promise<ApiResponse<Category[]>> {
-    const response = await fetch(`${API_BASE_URL}/admin/categories`, {
-      headers: {
-        ...this.getAuthHeaders(),
-      },
-    })
+    const response = await adminFetch(`${API_BASE_URL}/admin/categories`)
 
     if (!response.ok) {
       throw new Error('Failed to fetch categories')
@@ -29,11 +21,10 @@ class AdminCategoriesService {
    * Create a new category
    */
   async create(data: CategoryCreate): Promise<ApiResponse<Category>> {
-    const response = await fetch(`${API_BASE_URL}/admin/categories`, {
+    const response = await adminFetch(`${API_BASE_URL}/admin/categories`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...this.getAuthHeaders(),
       },
       body: JSON.stringify(data),
     })
@@ -50,11 +41,10 @@ class AdminCategoriesService {
    * Update a category
    */
   async update(id: string, data: CategoryUpdate): Promise<ApiResponse<Category>> {
-    const response = await fetch(`${API_BASE_URL}/admin/categories/${id}`, {
+    const response = await adminFetch(`${API_BASE_URL}/admin/categories/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        ...this.getAuthHeaders(),
       },
       body: JSON.stringify(data),
     })
@@ -71,11 +61,8 @@ class AdminCategoriesService {
    * Delete a category
    */
   async delete(id: string): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/admin/categories/${id}`, {
+    const response = await adminFetch(`${API_BASE_URL}/admin/categories/${id}`, {
       method: 'DELETE',
-      headers: {
-        ...this.getAuthHeaders(),
-      },
     })
 
     if (!response.ok) {
@@ -88,11 +75,10 @@ class AdminCategoriesService {
    * Reorder categories
    */
   async reorder(orders: CategoryReorderItem[]): Promise<{ message: string; updated: number }> {
-    const response = await fetch(`${API_BASE_URL}/admin/categories/reorder`, {
+    const response = await adminFetch(`${API_BASE_URL}/admin/categories/reorder`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        ...this.getAuthHeaders(),
       },
       body: JSON.stringify({ orders }),
     })

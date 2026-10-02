@@ -1,4 +1,4 @@
-import { authService } from './auth'
+import { adminFetch } from './auth'
 import type { ApiResponse, PaginatedResponse, Project } from '../../types'
 
 export interface CreateProjectData {
@@ -21,21 +21,12 @@ export interface CreateProjectData {
 export type UpdateProjectData = Partial<CreateProjectData>
 
 class AdminProjectsService {
-  private getAuthHeaders() {
-    return authService.getAuthHeaders()
-  }
-
   /**
    * Get all projects (including unpublished) for admin
    */
   async getAll(limit: number = 100): Promise<PaginatedResponse<Project>> {
-    const response = await fetch(
-      `${import.meta.env.VITE_API_BASE_URL || 'https://api.yarikama.com/api/v1'}/admin/projects?limit=${limit}`,
-      {
-        headers: {
-          ...this.getAuthHeaders(),
-        },
-      }
+    const response = await adminFetch(
+      `${import.meta.env.VITE_API_BASE_URL || 'https://api.yarikama.com/api/v1'}/admin/projects?limit=${limit}`
     )
 
     if (!response.ok) {
@@ -49,13 +40,12 @@ class AdminProjectsService {
    * Create a new project
    */
   async create(data: CreateProjectData): Promise<ApiResponse<Project>> {
-    const response = await fetch(
+    const response = await adminFetch(
       `${import.meta.env.VITE_API_BASE_URL || 'https://api.yarikama.com/api/v1'}/admin/projects`,
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...this.getAuthHeaders(),
         },
         body: JSON.stringify(data),
       }
@@ -73,13 +63,12 @@ class AdminProjectsService {
    * Update an existing project
    */
   async update(id: string, data: UpdateProjectData): Promise<ApiResponse<Project>> {
-    const response = await fetch(
+    const response = await adminFetch(
       `${import.meta.env.VITE_API_BASE_URL || 'https://api.yarikama.com/api/v1'}/admin/projects/${id}`,
       {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          ...this.getAuthHeaders(),
         },
         body: JSON.stringify(data),
       }
@@ -97,13 +86,10 @@ class AdminProjectsService {
    * Delete a project
    */
   async delete(id: string): Promise<void> {
-    const response = await fetch(
+    const response = await adminFetch(
       `${import.meta.env.VITE_API_BASE_URL || 'https://api.yarikama.com/api/v1'}/admin/projects/${id}`,
       {
         method: 'DELETE',
-        headers: {
-          ...this.getAuthHeaders(),
-        },
       }
     )
 
@@ -117,13 +103,12 @@ class AdminProjectsService {
    * Reorder projects
    */
   async reorder(orders: Array<{ id: string; order: number }>): Promise<{ message: string; updated: number }> {
-    const response = await fetch(
+    const response = await adminFetch(
       `${import.meta.env.VITE_API_BASE_URL || 'https://api.yarikama.com/api/v1'}/admin/projects/reorder`,
       {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          ...this.getAuthHeaders(),
         },
         body: JSON.stringify({ orders }),
       }

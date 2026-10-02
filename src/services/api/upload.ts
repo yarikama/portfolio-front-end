@@ -1,13 +1,9 @@
-import { authService } from './auth'
+import { adminFetch } from './auth'
 import type { ApiResponse, UploadResponse } from '../../types'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.yarikama.com/api/v1'
 
 class UploadService {
-  private getAuthHeaders() {
-    return authService.getAuthHeaders()
-  }
-
   /**
    * Upload an image to R2 Storage
    * @param file - The image file to upload
@@ -18,13 +14,10 @@ class UploadService {
     const formData = new FormData()
     formData.append('file', file)
 
-    const response = await fetch(
+    const response = await adminFetch(
       `${API_BASE_URL}/admin/upload/image?folder=${encodeURIComponent(folder)}`,
       {
         method: 'POST',
-        headers: {
-          ...this.getAuthHeaders(),
-        },
         body: formData,
       }
     )
@@ -43,13 +36,10 @@ class UploadService {
    * @param url - The full URL of the image to delete
    */
   async deleteImage(url: string): Promise<void> {
-    const response = await fetch(
+    const response = await adminFetch(
       `${API_BASE_URL}/admin/upload/image?url=${encodeURIComponent(url)}`,
       {
         method: 'DELETE',
-        headers: {
-          ...this.getAuthHeaders(),
-        },
       }
     )
 

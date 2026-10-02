@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { adminAskQuestionsService } from './adminAskQuestions'
 
 const page = { data: [], pagination: { total: 0, limit: 50, offset: 0, hasMore: false } }
@@ -9,14 +9,6 @@ function serve() {
   return fetch
 }
 
-beforeEach(() => {
-  const items = new Map<string, string>()
-  vi.stubGlobal('localStorage', {
-    getItem: (key: string) => items.get(key) ?? null,
-    setItem: (key: string, value: string) => items.set(key, value),
-    removeItem: (key: string) => items.delete(key),
-  })
-})
 afterEach(() => vi.unstubAllGlobals())
 
 describe('adminAskQuestionsService.list', () => {
