@@ -44,7 +44,7 @@ export default function AskWidget() {
         <div
           id="ask-widget"
           role="dialog"
-          aria-label="Ask about my work"
+          aria-label="Ask about me"
           // Phones: most of the screen, between the header and the footer
           // bar. Wider screens: a window above the button.
           className="fixed z-50 left-3 right-3 top-20 bottom-44
@@ -54,7 +54,7 @@ export default function AskWidget() {
         >
           <div className="flex items-start justify-between gap-3 px-5 pt-4 pb-3 border-b border-zinc-200 dark:border-zinc-700">
             <div>
-              <p className="font-serif text-xl">Ask about my work</p>
+              <p className="font-serif text-xl">Ask about me</p>
               <p className="text-xs text-zinc-400 mt-0.5">
                 A small model on my home server, answering from this site. It can be wrong.
               </p>
@@ -75,10 +75,10 @@ export default function AskWidget() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        aria-label={open ? 'Close the chat' : 'Ask about my work'}
+        aria-label={open ? 'Close the chat' : 'Ask about me'}
         aria-expanded={open}
         aria-controls="ask-widget"
-        title="Ask about my work"
+        title="Ask about me"
         // Above the fixed footer bar, which is taller on phones (two rows).
         className={`fixed z-50 right-4 bottom-28 sm:right-6 sm:bottom-20 w-14 h-14 rounded-full
           flex items-center justify-center bg-sage text-paper shadow-lg

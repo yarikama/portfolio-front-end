@@ -265,7 +265,7 @@ export default function AskChat({ className = '', compact = false, autoFocus = f
           onKeyDown={handleKeyDown}
           maxLength={MAX_QUESTION}
           rows={1}
-          placeholder={passage ? 'Ask about it, or press Enter' : 'Ask about my work…'}
+          placeholder={passage ? 'Ask about it, or press Enter' : 'Ask about me…'}
           // The border around it shows focus, so the site-wide ring
           // would draw a second box inside it.
           className={`flex-1 self-center resize-none bg-transparent font-serif focus-visible:outline-none! ${compact ? 'text-base' : 'text-lg'}`}
