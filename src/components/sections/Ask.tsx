@@ -84,9 +84,6 @@ export default function Ask() {
             A small language model on my home server answers from the projects and notes on this
             site and my resume, with sources. It can be wrong, so check the links.
           </p>
-          <p className="mt-3 text-sm text-zinc-faded max-w-2xl">
-            It remembers your last two questions for half an hour, so you can follow up.
-          </p>
         </div>
 
         <MagazineLine className="mb-8" />
