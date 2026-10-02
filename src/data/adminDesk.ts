@@ -34,13 +34,6 @@ export const PROMPTS = [
   'Which paper, post or talk changed how you work, and how?',
 ]
 
-// The day's routine on the welcome page, ticked off per day (in this
-// browser). A link opens what the item is about; another site, in a new tab.
-export const TODAY: { id: string; label: string; href: string }[] = [
-  { id: 'neetcode', label: 'Solve a problem on NeetCode', href: 'https://neetcode.io' },
-  { id: 'write', label: 'Write or polish a note', href: '/admin/notes' },
-]
-
 /** Whole days since 1970 in local time: the same index all day long. */
 export function dayIndex(date: Date): number {
   const local = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())

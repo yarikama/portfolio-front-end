@@ -132,7 +132,10 @@ export default function AdminHome() {
         <div className="mt-20 grid gap-12 md:grid-cols-2">
           <section>
             <p className="font-mono text-xs text-zinc-400 uppercase tracking-widest">Today</p>
-            <div className="mt-4">
+            <p className="mt-2 font-serif text-2xl" lang="zh-Hant">
+              今日事今日畢
+            </p>
+            <div className="mt-5">
               <TodayList date={day} />
             </div>
           </section>
