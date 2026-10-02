@@ -133,8 +133,6 @@ export default function Contact() {
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  minLength={2}
-                  maxLength={100}
                   className={`
                     w-full px-4 py-3 bg-transparent border
                     font-serif text-lg
@@ -192,8 +190,6 @@ export default function Contact() {
                 value={formData.subject}
                 onChange={handleChange}
                 required
-                minLength={5}
-                maxLength={200}
                 className={`
                   w-full px-4 py-3 bg-transparent border
                   font-serif text-lg
@@ -221,8 +217,6 @@ export default function Contact() {
                 value={formData.message}
                 onChange={handleChange}
                 required
-                minLength={10}
-                maxLength={5000}
                 rows={6}
                 className={`
                   w-full px-4 py-3 bg-transparent border resize-none
