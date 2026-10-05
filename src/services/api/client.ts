@@ -15,10 +15,14 @@ export class ApiClient {
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`
 
+    // Only a request with a body says what it is. A GET with Content-Type
+    // is not a "simple" request, so the browser would first send a CORS
+    // preflight: one more round trip to the origin, which the edge cache
+    // never answers.
     const config: RequestInit = {
       ...options,
       headers: {
-        'Content-Type': 'application/json',
+        ...(options.body !== undefined ? { 'Content-Type': 'application/json' } : {}),
         ...options.headers,
       },
     }

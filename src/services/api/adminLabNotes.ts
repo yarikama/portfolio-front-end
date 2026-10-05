@@ -20,8 +20,9 @@ export type UpdateLabNoteData = Partial<CreateLabNoteData>
 export async function authFetch<T>(url: string, options: RequestInit = {}): Promise<T> {
   const response = await adminFetch(url, {
     ...options,
+    // Only with a body: a GET with Content-Type would need a CORS preflight.
     headers: {
-      'Content-Type': 'application/json',
+      ...(options.body !== undefined ? { 'Content-Type': 'application/json' } : {}),
       ...options.headers,
     },
   })

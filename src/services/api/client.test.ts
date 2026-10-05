@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { apiErrorMessage } from './client'
+import { ApiClient, apiErrorMessage } from './client'
 import { authFetch } from './adminLabNotes'
 import { adminProjectsService } from './adminProjects'
 
@@ -43,5 +43,33 @@ describe('admin errors reach the editor', () => {
     await expect(adminProjectsService.create({} as never)).rejects.toThrow(
       "Project with slug 'x' already exists",
     )
+  })
+})
+
+describe('a GET sends no Content-Type, so it needs no CORS preflight', () => {
+  const headersOf = (fetch: ReturnType<typeof vi.fn>, call: number) =>
+    new Headers(fetch.mock.calls[call][1].headers as HeadersInit)
+
+  it('in the public client', async () => {
+    const fetch = vi.fn().mockImplementation(async () => new Response('{}'))
+    vi.stubGlobal('fetch', fetch)
+    const client = new ApiClient('https://api.example.com')
+
+    await client.get('/projects')
+    await client.post('/contact', { name: 'A' })
+
+    expect(headersOf(fetch, 0).has('Content-Type')).toBe(false)
+    expect(headersOf(fetch, 1).get('Content-Type')).toBe('application/json')
+  })
+
+  it('in authFetch', async () => {
+    const fetch = vi.fn().mockImplementation(async () => new Response('{}'))
+    vi.stubGlobal('fetch', fetch)
+
+    await authFetch('/admin/todos?day=2026-10-05')
+    await authFetch('/admin/goal', { method: 'PUT', body: JSON.stringify({ text: 'x' }) })
+
+    expect(headersOf(fetch, 0).has('Content-Type')).toBe(false)
+    expect(headersOf(fetch, 1).get('Content-Type')).toBe('application/json')
   })
 })
