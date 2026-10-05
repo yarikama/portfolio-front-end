@@ -92,16 +92,28 @@ export class ApiClient {
 /**
  * A readable message from an error response. The API (FastAPI) answers
  * {"detail": "..."}, e.g. "Too many login attempts. Try again in 15
- * minutes." on a 429; the {"error": {"message"}} shape is still accepted.
+ * minutes." on a 429, or on a 422 a list with one entry per field that
+ * failed validation; the {"error": {"message"}} shape is still accepted.
+ * `fallback` is for a response that says nothing readable.
  */
-export function apiErrorMessage(body: unknown, status: number): string {
+export function apiErrorMessage(body: unknown, status: number, fallback?: string): string {
   if (body && typeof body === 'object') {
     const { error, detail } = body as { error?: { message?: string }; detail?: unknown }
     if (error?.message) return error.message
     if (typeof detail === 'string') return detail
+    if (Array.isArray(detail)) {
+      const problems = detail.flatMap((item) => {
+        const { loc, msg } = (item ?? {}) as { loc?: unknown[]; msg?: unknown }
+        if (typeof msg !== 'string') return []
+        // loc starts with where the value was (body, query); a field follows.
+        const field = Array.isArray(loc) && loc.length > 1 ? loc.at(-1) : undefined
+        return [typeof field === 'string' ? `${field}: ${msg}` : msg]
+      })
+      if (problems.length > 0) return problems.join('; ')
+    }
   }
   if (status === 429) return 'Too many requests. Please try again later.'
-  return `Request failed (HTTP ${status})`
+  return fallback ?? `Request failed (HTTP ${status})`
 }
 
 export class ApiRequestError extends Error {
