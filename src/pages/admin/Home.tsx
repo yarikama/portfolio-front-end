@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, FilePen, Inbox, MessageSquare } from 'lucide-react'
+import { ArrowRight, FilePen, Inbox, MessageSquare, Users } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import AdminNav from '../../components/admin/AdminNav'
 import CoffeeCup from '../../components/admin/CoffeeCup'
@@ -10,7 +10,7 @@ import ContributionHeatmap from '../../components/admin/ContributionHeatmap'
 import TodayList from '../../components/admin/TodayList'
 import { PROMPTS, THOUGHTS, forToday, greeting } from '../../data/adminDesk'
 import { useNewQuestions, useUnreadMessages } from '../../hooks'
-import { adminLabNotesService } from '../../services/api'
+import { adminLabNotesService, adminVisitorsService } from '../../services/api'
 
 // The admin's first page after signing in: a greeting, a thought and a
 // question for the day, a cup of coffee, and what is waiting.
@@ -37,6 +37,23 @@ function useDrafts(): number | null {
     }
   }, [])
   return drafts
+}
+
+// Visitors over the last seven days; undefined hides the row (Vercel not set
+// up, or unavailable).
+function useWeekVisitors(): number | null | undefined {
+  const [visitors, setVisitors] = useState<number | null | undefined>(null)
+  useEffect(() => {
+    let live = true
+    adminVisitorsService
+      .report(7)
+      .then((report) => live && setVisitors(report.visitors))
+      .catch(() => live && setVisitors(undefined))
+    return () => {
+      live = false
+    }
+  }, [])
+  return visitors
 }
 
 function Waiting({
@@ -78,6 +95,7 @@ export default function AdminHome() {
   const unread = useUnreadMessages()
   const newQuestions = useNewQuestions()
   const drafts = useDrafts()
+  const weekVisitors = useWeekVisitors()
   // Changes once a day, so the routine reloads only then.
   const dayKey = now.toDateString()
   const day = useMemo(() => new Date(dayKey), [dayKey])
@@ -179,6 +197,16 @@ export default function AdminHome() {
                 many="{n} drafts waiting to be finished"
                 none="No drafts in progress"
               />
+              {weekVisitors !== undefined && (
+                <Waiting
+                  to="/admin/visitors"
+                  icon={Users}
+                  count={weekVisitors}
+                  one="1 visitor this week"
+                  many="{n} visitors this week"
+                  none="No visitors this week"
+                />
+              )}
             </div>
           </section>
         </div>
