@@ -13,6 +13,7 @@ import {
   MessageSquare,
   Tags,
   UserRound,
+  Users,
 } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
@@ -53,6 +54,7 @@ const GROUPS: Group[] = [
     children: [
       { label: 'Messages', href: '/admin/messages', icon: Inbox, count: 'unread' },
       { label: 'Questions', href: '/admin/questions', icon: MessageSquare, count: 'new' },
+      { label: 'Visitors', href: '/admin/visitors', icon: Users },
       // Dashboards for the home cluster. Both sit behind Cloudflare Access,
       // so a visitor who finds these links only reaches a login page.
       { label: 'Grafana', href: 'https://grafana.yarikama.com', icon: Gauge, external: true },
