@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import type { LucideIcon } from 'lucide-react'
 import {
@@ -14,6 +15,7 @@ import {
   UserRound,
 } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
+import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { useNewQuestions, useUnreadMessages } from '../../hooks/useUnreadMessages'
 import ThemeToggle from '../ui/ThemeToggle'
 
@@ -67,6 +69,36 @@ export default function AdminNav() {
   const navigate = useNavigate()
   const { user, logout } = useAuth()
   const counts = { unread: useUnreadMessages() ?? 0, new: useNewQuestions() ?? 0 }
+
+  // Tailwind's hover variants only apply where the screen can hover, and
+  // Safari doesn't focus a tapped link, so on a phone or an iPad a tap on a
+  // group's label opens its menu instead. Kept with the page it was opened
+  // on, so it is closed again on the next page.
+  const canHover = useMediaQuery('(hover: hover)')
+  const [tapped, setTapped] = useState<{ label: string; path: string } | null>(null)
+  const openLabel = tapped?.path === location.pathname ? tapped.label : null
+  const openRef = useRef<HTMLLIElement>(null)
+
+  // A tap anywhere else, or Escape, closes it.
+  useEffect(() => {
+    if (!openLabel) return
+    const handlePointerDown = (e: PointerEvent) => {
+      if (!openRef.current?.contains(e.target as Node)) setTapped(null)
+    }
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      setTapped(null)
+      if (document.activeElement instanceof HTMLElement && openRef.current?.contains(document.activeElement)) {
+        document.activeElement.blur()
+      }
+    }
+    document.addEventListener('pointerdown', handlePointerDown)
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown)
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [openLabel])
   const badge = (n: number, label: string, className = '') =>
     n > 0 ? (
       <span
@@ -96,33 +128,54 @@ export default function AdminNav() {
         {sub.external && <ArrowUpRight aria-hidden="true" className="w-3 h-3 ml-auto" />}
       </>
     )
+    const close = () => setTapped(null)
     if (sub.external) {
       return (
-        <a href={sub.href} target="_blank" rel="noopener noreferrer" className={className}>
+        <a href={sub.href} target="_blank" rel="noopener noreferrer" onClick={close} className={className}>
           {content}
         </a>
       )
     }
     return (
-      <Link to={sub.href} aria-current={isActive(sub) ? 'page' : undefined} className={className}>
+      <Link
+        to={sub.href}
+        aria-current={isActive(sub) ? 'page' : undefined}
+        onClick={close}
+        className={className}
+      >
         {content}
       </Link>
     )
   }
 
-  // Hover or keyboard focus opens it (CSS only), as in the site's header.
-  // The padding on top bridges the gap, so the pointer can travel from the
-  // label into the panel, and it closes after a short delay rather than as
-  // soon as the pointer slips off.
+  // Hover or keyboard focus opens it (CSS only), as in the site's header,
+  // and a tap where hover isn't possible (data-open). The padding on top
+  // bridges the gap, so the pointer can travel from the label into the
+  // panel, and it closes after a short delay rather than as soon as the
+  // pointer slips off.
   const renderGroup = (group: Group, index: number) => {
     // The last menu opens leftward on a phone, so it stays on the screen.
     const align = index === GROUPS.length - 1 ? 'right-0 sm:right-auto sm:left-0' : 'left-0'
 
     const active = group.children.some(isActive)
+    const open = openLabel === group.label
     return (
-      <li key={group.label} className="group relative">
+      <li
+        key={group.label}
+        ref={open ? openRef : undefined}
+        data-open={open || undefined}
+        className="group relative"
+      >
         <Link
           to={group.href}
+          aria-expanded={canHover ? undefined : open}
+          onClick={(e) => {
+            if (canHover) return
+            e.preventDefault()
+            // Chrome focuses a tapped link, which would hold it open.
+            if (open) e.currentTarget.blur()
+            setTapped(open ? null : { label: group.label, path: location.pathname })
+          }}
           className={`
             inline-flex items-center gap-1.5 px-4 py-2 rounded
             font-mono text-xs uppercase tracking-widest transition-colors
@@ -140,7 +193,7 @@ export default function AdminNav() {
           )}
           <ChevronDown
             aria-hidden="true"
-            className="w-3 h-3 transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180 motion-reduce:transition-none"
+            className="w-3 h-3 transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180 group-data-open:rotate-180 motion-reduce:transition-none"
           />
         </Link>
         <div
@@ -148,6 +201,7 @@ export default function AdminNav() {
             invisible opacity-0 translate-y-1 delay-150
             group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-hover:delay-0
             group-focus-within:visible group-focus-within:opacity-100 group-focus-within:translate-y-0 group-focus-within:delay-0
+            group-data-open:visible group-data-open:opacity-100 group-data-open:translate-y-0 group-data-open:delay-0
             transition-[opacity,translate,visibility] duration-150 motion-reduce:transition-none`}
         >
           <ul
