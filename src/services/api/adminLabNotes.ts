@@ -1,4 +1,5 @@
 import { adminFetch } from './auth'
+import { apiErrorMessage } from './client'
 import type { ApiResponse, LabNote } from '../../types'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.yarikama.com/api/v1'
@@ -32,8 +33,8 @@ export async function authFetch<T>(url: string, options: RequestInit = {}): Prom
   }
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}))
-    throw new Error(error.error?.message || `Request failed: ${response.status}`)
+    const body: unknown = await response.json().catch(() => null)
+    throw new Error(apiErrorMessage(body, response.status))
   }
 
   if (response.status === 204) {

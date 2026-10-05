@@ -1,4 +1,5 @@
 import { adminFetch } from './auth'
+import { apiErrorMessage } from './client'
 import type { ApiResponse, PaginatedResponse, Project } from '../../types'
 
 export interface CreateProjectData {
@@ -52,8 +53,8 @@ class AdminProjectsService {
     )
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({}))
-      throw new Error(error.error?.message || 'Failed to create project')
+      const body: unknown = await response.json().catch(() => null)
+      throw new Error(apiErrorMessage(body, response.status, 'Failed to create project'))
     }
 
     return response.json()
@@ -75,8 +76,8 @@ class AdminProjectsService {
     )
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({}))
-      throw new Error(error.error?.message || 'Failed to update project')
+      const body: unknown = await response.json().catch(() => null)
+      throw new Error(apiErrorMessage(body, response.status, 'Failed to update project'))
     }
 
     return response.json()
@@ -94,8 +95,8 @@ class AdminProjectsService {
     )
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({}))
-      throw new Error(error.error?.message || 'Failed to delete project')
+      const body: unknown = await response.json().catch(() => null)
+      throw new Error(apiErrorMessage(body, response.status, 'Failed to delete project'))
     }
   }
 
@@ -115,8 +116,8 @@ class AdminProjectsService {
     )
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({}))
-      throw new Error(error.error?.message || 'Failed to reorder projects')
+      const body: unknown = await response.json().catch(() => null)
+      throw new Error(apiErrorMessage(body, response.status, 'Failed to reorder projects'))
     }
 
     const data = await response.json()

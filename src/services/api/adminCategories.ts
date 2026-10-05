@@ -1,4 +1,5 @@
 import { adminFetch } from './auth'
+import { apiErrorMessage } from './client'
 import type { ApiResponse, Category, CategoryCreate, CategoryUpdate, CategoryReorderItem } from '../../types'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.yarikama.com/api/v1'
@@ -30,8 +31,8 @@ class AdminCategoriesService {
     })
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({}))
-      throw new Error(error.detail || 'Failed to create category')
+      const body: unknown = await response.json().catch(() => null)
+      throw new Error(apiErrorMessage(body, response.status, 'Failed to create category'))
     }
 
     return response.json()
@@ -50,8 +51,8 @@ class AdminCategoriesService {
     })
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({}))
-      throw new Error(error.detail || 'Failed to update category')
+      const body: unknown = await response.json().catch(() => null)
+      throw new Error(apiErrorMessage(body, response.status, 'Failed to update category'))
     }
 
     return response.json()
@@ -66,8 +67,8 @@ class AdminCategoriesService {
     })
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({}))
-      throw new Error(error.detail || 'Failed to delete category')
+      const body: unknown = await response.json().catch(() => null)
+      throw new Error(apiErrorMessage(body, response.status, 'Failed to delete category'))
     }
   }
 
@@ -84,8 +85,8 @@ class AdminCategoriesService {
     })
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({}))
-      throw new Error(error.detail || 'Failed to reorder categories')
+      const body: unknown = await response.json().catch(() => null)
+      throw new Error(apiErrorMessage(body, response.status, 'Failed to reorder categories'))
     }
 
     const data = await response.json()
