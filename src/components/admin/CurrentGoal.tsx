@@ -45,6 +45,8 @@ export default function CurrentGoal() {
     return <p className="text-sm text-zinc-faded">The goal is unavailable right now.</p>
   }
 
+  // lang: Cormorant has no Chinese, and in a zh-Hant element the browser falls
+  // back to a Chinese serif, the same one as 今日事今日畢 on the page, not a sans
   const big = 'font-serif text-4xl md:text-6xl font-light tracking-tight leading-tight'
 
   if (editing) {
@@ -62,6 +64,7 @@ export default function CurrentGoal() {
           }
         }}
         maxLength={120}
+        lang="zh-Hant"
         aria-label="Current goal"
         placeholder="A few words"
         className={`${big} w-full border-b border-zinc-300 bg-transparent pb-1 placeholder:text-zinc-300 focus:border-sage focus:outline-none`}
@@ -76,7 +79,7 @@ export default function CurrentGoal() {
       title="Change the goal"
       className="group flex w-full items-start gap-4 text-left"
     >
-      <span className={`${big} ${goal ? '' : 'text-zinc-300'}`}>
+      <span lang="zh-Hant" className={`${big} ${goal ? '' : 'text-zinc-300'}`}>
         {goal === null ? '…' : goal || 'Set a goal'}
       </span>
       <Pencil
