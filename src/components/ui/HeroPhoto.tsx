@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { useFinePointer, usePrefersReducedMotion } from '../../hooks'
 
 export interface PhotoLayer {
@@ -30,6 +30,10 @@ export default function HeroPhoto({ layers, alt, width, height, className = '' }
   const finePointer = useFinePointer()
   const reducedMotion = usePrefersReducedMotion()
   const parallaxEnabled = finePointer && !reducedMotion
+  // Hidden until every layer has arrived (or failed), so the photo appears
+  // whole at once instead of assembling layer by layer on a slow connection
+  const [settled, setSettled] = useState(0)
+  const settle = () => setSettled((n) => n + 1)
 
   // Write transforms straight to the DOM so mouse movement never re-renders
   const setParallax = (x: number, y: number) => {
@@ -55,6 +59,7 @@ export default function HeroPhoto({ layers, alt, width, height, className = '' }
     <div
       ref={containerRef}
       className={`hero-photo-container ${className}`}
+      style={{ visibility: settled < layers.length ? 'hidden' : undefined }}
       onMouseMove={parallaxEnabled ? handleMouseMove : undefined}
       onMouseLeave={parallaxEnabled ? () => setParallax(0, 0) : undefined}
     >
@@ -70,6 +75,8 @@ export default function HeroPhoto({ layers, alt, width, height, className = '' }
           width={width}
           height={height}
           fetchPriority="high"
+          onLoad={settle}
+          onError={settle}
           // The first layer sets the frame's size; the rest stack on top of it
           className={i === 0 ? 'hero-photo-bg' : 'hero-photo-fg'}
           style={{ ...restTransform, filter: layer.grayscale ? 'grayscale(1)' : undefined }}
@@ -86,6 +93,8 @@ export default function HeroPhoto({ layers, alt, width, height, className = '' }
         width={width}
         height={height}
         fetchPriority="high"
+        onLoad={settle}
+        onError={settle}
         className="hero-photo-fg"
         style={restTransform}
         draggable={false}

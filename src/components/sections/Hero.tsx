@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import Container from '../layout/Container'
 import HeroPhoto from '../ui/HeroPhoto'
 import FlipText from '../ui/FlipText'
@@ -13,13 +13,7 @@ function barScale(i: number, progress: number) {
 }
 
 export default function Hero() {
-  const [isVisible, setIsVisible] = useState(false)
   const barRefs = useRef<(HTMLDivElement | null)[]>([])
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), 100)
-    return () => clearTimeout(timer)
-  }, [])
 
   // Drive the bars from scroll without re-rendering the hero
   useEffect(() => {
@@ -59,26 +53,13 @@ export default function Hero() {
         <div className="py-32 md:py-40 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left: Text content */}
           <div>
-            <h1
-              className={`
-                font-serif font-light tracking-tight leading-[0.9]
-                text-[clamp(4rem,12vw,10rem)] lg:text-[clamp(3rem,8vw,7rem)]
-                transition-[opacity,translate] duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)]
-                ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}
-              `}
-            >
+            <h1 className="font-serif font-light tracking-tight leading-[0.9] text-[clamp(4rem,12vw,10rem)] lg:text-[clamp(3rem,8vw,7rem)]">
               <FlipText front="Henry" back="恒睿" />
               <br />
               <FlipText front="Hsu" back="許" className="italic" backClassName="not-italic" />
             </h1>
 
-            <div
-              className={`
-                mt-12 md:mt-16
-                transition-[opacity,translate] duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] delay-300
-                ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}
-              `}
-            >
+            <div className="mt-12 md:mt-16">
               <p className="text-2xl md:text-3xl text-zinc-faded leading-relaxed font-light">
                 Building AI systems, and the infrastructure behind them.
               </p>
@@ -89,13 +70,7 @@ export default function Hero() {
               </p>
             </div>
 
-            <div
-              className={`
-                mt-12 flex flex-wrap gap-4
-                transition-[opacity,translate] duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] delay-500
-                ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}
-              `}
-            >
+            <div className="mt-12 flex flex-wrap gap-4">
               <a
                 href="https://english.president.gov.tw/News/6881"
                 target="_blank"
@@ -133,13 +108,7 @@ export default function Hero() {
           </div>
 
           {/* Right: Interactive photo */}
-          <div
-            className={`
-              lg:justify-self-end
-              transition-[opacity,translate] duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] delay-200
-              ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}
-            `}
-          >
+          <div className="lg:justify-self-end">
             <HeroPhoto
               // Split from one photo, far to near: sky and street, the bridge,
               // the buildings on either side, the crowd (in black and white so
@@ -160,13 +129,7 @@ export default function Hero() {
         </div>
       </Container>
 
-      <div
-        className={`
-          absolute bottom-12 left-1/2 -translate-x-1/2
-          transition-opacity duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] delay-700
-          ${isVisible ? 'opacity-100' : 'opacity-0'}
-        `}
-      >
+      <div className="absolute bottom-12 left-1/2 -translate-x-1/2">
         <div className="flex items-center gap-4">
           <div className="flex items-end gap-1">{[0, 1, 2, 3, 4].map(renderBar)}</div>
           <div className="font-mono text-sm text-zinc-400 uppercase tracking-widest">
